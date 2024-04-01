@@ -1,0 +1,33 @@
+#background{
+    -fx-background-color:  #e6e8e7;
+}
+
+.radius{
+    -fx-background-radius: 6px;
+}
+
+.text-field{
+    -fx-background-color: transparent;
+    -fx-border-color: #188ba7;
+    -fx-border-width:  0px 0px 2px 0px;
+}
+
+#buttonLogin{
+    -fx-background-radius: 2em;
+    -fx-background-color:  #188ba7;
+}
+
+#buttonRegister{
+    -fx-background-radius: 2em;
+}
+#loginGoogle{
+    -fx-background-color: red;
+}
+
+#loginGithub{
+    -fx-background-color: black;
+}
+
+.hyperlink{
+    -fx-text-fill: #188ba7;
+}

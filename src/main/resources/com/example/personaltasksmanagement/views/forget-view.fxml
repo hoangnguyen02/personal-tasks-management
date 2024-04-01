@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.ForgetPassword">
+    <children>
+        <Label layoutX="64.0" layoutY="105.0" text="Your Email: ">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Label>
+        <Label layoutX="62.0" layoutY="206.0" text="Verification Code: ">
+            <font>
+                <Font size="18.0" />
+            </font>
+        </Label>
+        <Button fx:id="submitButton" layoutX="303.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleSubmitButton" prefHeight="38.0" prefWidth="70.0" text="Submit" />
+        <Button fx:id="sendCodeButton" layoutX="390.0" layoutY="293.0" mnemonicParsing="false" onAction="#handleSendCodeButton" prefHeight="38.0" prefWidth="141.0" text="Send Verification Code" />
+        <TextField fx:id="emailTextField" layoutX="223.0" layoutY="99.0" prefHeight="38.0" prefWidth="334.0" promptText="Enter your registered..." />
+        <TextField fx:id="codeTextField" layoutX="224.0" layoutY="200.0" prefHeight="38.0" prefWidth="150.0" promptText="Enter OTP" />
+    </children>
+</AnchorPane>
