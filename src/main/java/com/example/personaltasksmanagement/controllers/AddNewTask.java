@@ -53,12 +53,13 @@ public class AddNewTask implements Initializable {
                     || datePicket.getValue() == null
                     || statusComboBox.getValue() == null
                     || priorityComboBox.getValue() == null) {
-
                 Alert alert = new Alert(Alert.AlertType.ERROR);
                 alert.setTitle("Error");
                 alert.setContentText("Please fill all blank fields");
                 alert.showAndWait();
-            }else {
+            } else if (statusComboBox.getValue().equalsIgnoreCase("Complete")) {
+                showAlert(Alert.AlertType.ERROR, "Error", "You cannot create a task with 'Complete' status");
+            } else {
                 if (datePicket.getValue().isBefore(LocalDate.now().minusDays(1L))){
                     Alert alert = new Alert(Alert.AlertType.ERROR);
                     alert.setTitle("Error");

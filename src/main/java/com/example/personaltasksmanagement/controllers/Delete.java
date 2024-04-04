@@ -52,22 +52,21 @@ public class Delete implements Initializable {
 
     @FXML
     private TableColumn<?, ?> trashTask;
+
     Connection connect = DBConnection.connectionDB();
+
     public ObservableList<TaskData> TrashList(){
         ObservableList<TaskData> listData = FXCollections.observableArrayList();
-
         String selectData = "SELECT * FROM trash WHERE user_id = ?";
 
-
         try {
-
             PreparedStatement preparedStatement = connect.prepareStatement(selectData);
             preparedStatement.setInt(1, UserSession.getInstance().getUserId());
             ResultSet resultSet = preparedStatement.executeQuery();
 
             TaskData taskData;
             while (resultSet.next()){
-                taskData = new TaskData(resultSet.getInt("trash_id"),
+                taskData = new TaskData(resultSet.getInt("task_id"),
                         resultSet.getInt("user_id"),
                         resultSet.getString("task"),
                         resultSet.getString("description"),
@@ -77,14 +76,14 @@ public class Delete implements Initializable {
                         resultSet.getDate("due_date"));
                 listData.add(taskData);
             }
-        }catch (Exception e){
+        } catch (Exception e){
             e.printStackTrace();
         }
         return listData;
     }
+
     public void TrashShowData() {
         ObservableList<TaskData> TaskListData = TrashList();
-
 
         trashTask.setCellValueFactory(new PropertyValueFactory<>("task"));
         trashDescription.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -93,9 +92,7 @@ public class Delete implements Initializable {
         trashCreate.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
         trashDueDate.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
 
-
-
-        // Tạo ô chứa nút chỉnh sửa và xóa
+        // Tạo ô chứa nút xoá và khôi phục
         Callback<TableColumn<TaskData, String>, TableCell<TaskData, String>> cellFactory = (TableColumn<TaskData, String> param) -> {
             final TableCell<TaskData, String> cell = new TableCell<TaskData, String>() {
                 @Override
@@ -105,48 +102,23 @@ public class Delete implements Initializable {
                         setGraphic(null);
                         setText(null);
                     } else {
-                        // Tạo icon cho các nút chỉnh sửa và xóa
-                        FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL_SQUARE);
                         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
+                        FontAwesomeIconView recoveryIcon = new FontAwesomeIconView(FontAwesomeIcon.UNDO);
 
-                        editIcon.setStyle(
-                                "-fx-cursor: hand ;"
-                                        + "-glyph-size: 28px;"
-                                        + "-fx-fill: #00E676;"
-                        );
                         deleteIcon.setStyle(
                                 "-fx-cursor: hand ;"
                                         + "-glyph-size: 28px;"
-                                        + "-fx-fill: #ff1744;"
+                                        + "-fx-fill: red;"
+                        );
+                        recoveryIcon.setStyle(
+                                "-fx-cursor: hand ;"
+                                        + "-glyph-size: 28px;"
+                                        + "-fx-fill: green;"
                         );
 
-                        // Xử lý sự kiện khi nhấp vào nút chỉnh sửa
-                        editIcon.setOnMouseClicked((MouseEvent event) -> {
-                            try {
-                                // Lấy dữ liệu của task được chọn
-                                TaskData selectedTask = getTableView().getItems().get(getIndex());
-
-                                // Hiển thị cửa sổ chỉnh sửa task
-                                FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/add-new.fxml"));
-                                Parent root = loader.load();
-                                AddNewTask controller = loader.getController();
-                                if (controller == null) {
-                                    controller = new AddNewTask();
-                                    loader.setController(controller);
-                                }
-                                controller.setTaskData(selectedTask);
-                                Stage stage = new Stage();
-                                stage.setScene(new Scene(root));
-                                stage.showAndWait();
-                                TrashShowData();
-                            } catch (Exception e) {
-                                e.printStackTrace();
-                            }
-                        });
                         deleteIcon.setOnMouseClicked((MouseEvent event) -> {
                             TaskData selectedTask = getTableView().getItems().get(getIndex());
 
-                            // Xác nhận xóa task
                             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                             alert.setTitle("Confirmation");
                             alert.setHeaderText("Delete Task");
@@ -154,17 +126,33 @@ public class Delete implements Initializable {
 
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.OK) {
-
-                                // Cập nhật TableView
+                                // Xóa task khỏi TableView
                                 TaskListData.remove(selectedTask);
                             }
                         });
 
-                        // Tạo HBox chứa các nút chỉnh sửa và xóa
-                        HBox actionBox = new HBox(editIcon, deleteIcon);
+                        // Xử lý sự kiện khi nhấp vào nút khôi phục
+                        recoveryIcon.setOnMouseClicked((MouseEvent event) -> {
+                            TaskData selectedTask = getTableView().getItems().get(getIndex());
+
+                            // Xác nhận khôi phục task
+                            Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
+                            alert.setTitle("Confirmation");
+                            alert.setHeaderText("Recover Task");
+                            alert.setContentText("Are you sure you want to recover this task?");
+
+                            Optional<ButtonType> result = alert.showAndWait();
+                            if (result.isPresent() && result.get() == ButtonType.OK) {
+                                removeTask(selectedTask);
+
+                            }
+                        });
+
+                        // Tạo HBox chứa các nút xoá và khôi phục
+                        HBox actionBox = new HBox(deleteIcon, recoveryIcon);
                         actionBox.setStyle("-fx-alignment: center;");
-                        HBox.setMargin(editIcon, new Insets(2, 3, 0, 2));
-                        HBox.setMargin(deleteIcon, new Insets(2, 2, 0, 3));
+                        HBox.setMargin(deleteIcon, new Insets(2, 3, 0, 2));
+                        HBox.setMargin(recoveryIcon, new Insets(2, 2, 0, 3));
 
                         setGraphic(actionBox);
                         setText(null);
@@ -176,10 +164,30 @@ public class Delete implements Initializable {
         };
 
         trashAction.setCellFactory(cellFactory);
-
         table_trashs.setItems(TrashList());
     }
 
+    public void removeTask(TaskData selected){
+        try {
+            String insertQuery = "INSERT INTO tasks (user_id,task, description, status, priority, create_at, due_date) " +
+                    "SELECT user_id, task, description, status, priority, create_at, due_date " +
+                    "FROM trash " +
+                    "WHERE task_id = ?";
+
+            PreparedStatement preparedStatement = connect.prepareStatement(insertQuery);
+            preparedStatement.setInt(1, selected.getTask_id());
+            preparedStatement.executeUpdate();
+
+            String deleteQuery = "DELETE FROM Trash WHERE task_id=?";
+            preparedStatement = connect.prepareStatement(deleteQuery);
+            preparedStatement.setInt(1,selected.getTask_id());
+            preparedStatement.executeUpdate();
+            TrashShowData();
+
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
         TrashShowData();

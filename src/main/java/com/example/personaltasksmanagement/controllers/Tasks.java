@@ -71,7 +71,6 @@ public class Tasks implements Initializable {
 
         String selectData = "SELECT * FROM tasks WHERE user_id = ?";
 
-
         try {
 
             PreparedStatement preparedStatement = connect.prepareStatement(selectData);
@@ -97,8 +96,7 @@ public class Tasks implements Initializable {
     }
     private static Comparator<TaskData> PriorityComparator = new Comparator<TaskData>() {
         @Override
-        public int compare(TaskData task1, TaskData task2) {
-            // Sắp xếp theo mức độ ưu tiên: high - medium - low
+        public int compare(TaskData task1, TaskData task2){
             if (task1.getPriority().equals("high")) {
                 return -1;
             } else if (task1.getPriority().equals("low")) {
@@ -181,7 +179,7 @@ public class Tasks implements Initializable {
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.OK) {
                                 // Xóa task từ cơ sở dữ liệu
-                                deleteTaskAndShowTrashPage(selectedTask);
+                                deleteTask(selectedTask);
 
                                 // Cập nhật TableView
                                 TaskListData.remove(selectedTask);
@@ -207,7 +205,7 @@ public class Tasks implements Initializable {
 
         table_tasks.setItems(TaskListData);
     }
-    private void deleteTaskAndShowTrashPage(TaskData selectedTask) {
+    private void deleteTask(TaskData selectedTask) {
         try {
             String insertQuery = "INSERT INTO trash (user_id, task, description, status, priority, create_at, due_date) " +
                     "SELECT user_id, task, description, status, priority, create_at, due_date " +

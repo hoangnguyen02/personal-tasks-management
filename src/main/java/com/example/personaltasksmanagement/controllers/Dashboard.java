@@ -1,8 +1,12 @@
 package com.example.personaltasksmanagement.controllers;
 
 import com.example.personaltasksmanagement.Main;
+import com.example.personaltasksmanagement.database.DBConnection;
 import com.example.personaltasksmanagement.models.UserSession;
 import javafx.application.Platform;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -10,19 +14,17 @@ import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.control.Alert;
-import javafx.scene.control.Button;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Label;
+import javafx.scene.control.*;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 import java.io.IOException;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Optional;
-import java.util.ResourceBundle;
+import java.util.*;
 
 public class Dashboard implements Initializable {
     @FXML
@@ -34,6 +36,38 @@ public class Dashboard implements Initializable {
 
     @FXML
     private Button logoutButton;
+
+    @FXML
+    private TableColumn<?, ?> status_recent;
+
+    @FXML
+    private TableView<Map.Entry<String, String>> table_recent;
+
+    @FXML
+    private TableColumn<?, ?> title_recent;
+
+
+    Connection connect = DBConnection.connectionDB();
+
+    public ObservableList<Map.Entry<String, String>> TaskRecentList() {
+        ObservableList<Map.Entry<String, String>> recentList = FXCollections.observableArrayList();
+        try {
+            String query = "SELECT task, status FROM tasks ORDER BY create_at DESC LIMIT 10";
+            PreparedStatement statement = connect.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            while (resultSet.next()) {
+                String task = resultSet.getString("task");
+                String status = resultSet.getString("status");
+                Map.Entry<String, String> recentData = new AbstractMap.SimpleEntry<>(task, status);
+                recentList.add(recentData);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return recentList;
+    }
 
     //final
     public void runTime() {
@@ -112,12 +146,6 @@ public class Dashboard implements Initializable {
         contentArea.getChildren().setAll(root);
     }
 
-    public void loadNotePage(ActionEvent event) throws IOException{
-        FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/note-view.fxml"));
-        Parent root = loader.load();
-        contentArea.getChildren().removeAll();
-        contentArea.getChildren().setAll(root);
-    }
     public void loadDeletePage(ActionEvent event) throws IOException{
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/delete-view.fxml"));
         Parent root = loader.load();
@@ -129,10 +157,11 @@ public class Dashboard implements Initializable {
         Parent root = loader.load();
         contentArea.getChildren().removeAll();
         contentArea.getChildren().setAll(root);
-    }
+   }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
+
         runTime();
     }
 }
