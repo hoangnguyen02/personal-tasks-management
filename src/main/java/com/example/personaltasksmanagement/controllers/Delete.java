@@ -126,16 +126,42 @@ public class Delete implements Initializable {
 
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.OK) {
-                                // Xóa task khỏi TableView
-                                TaskListData.remove(selectedTask);
+                                try {
+                                    String deleteQuery = "DELETE FROM trash WHERE task_id = ?";
+                                    PreparedStatement statement = connect.prepareStatement(deleteQuery);
+                                    statement.setInt(1, selectedTask.getTask_id());
+                                    int rowsDeleted = statement.executeUpdate();
+
+                                    if (rowsDeleted > 0) {
+                                        TaskListData.remove(selectedTask); // Xóa task khỏi ObservableList
+                                        TrashShowData(); // Cập nhật lại TableView sau khi xóa thành công
+
+                                        Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
+                                        successAlert.setTitle("Success");
+                                        successAlert.setHeaderText(null);
+                                        successAlert.setContentText("Task deleted successfully");
+                                        successAlert.showAndWait();
+                                    } else {
+                                        Alert warningAlert = new Alert(Alert.AlertType.WARNING);
+                                        warningAlert.setTitle("Warning");
+                                        warningAlert.setHeaderText(null);
+                                        warningAlert.setContentText("Task not found or already deleted");
+                                        warningAlert.showAndWait();
+                                    }
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+
+                                    Alert errorAlert = new Alert(Alert.AlertType.ERROR);
+                                    errorAlert.setTitle("Error");
+                                    errorAlert.setHeaderText(null);
+                                    errorAlert.setContentText("Failed to delete task");
+                                    errorAlert.showAndWait();
+                                }
                             }
                         });
-
-                        // Xử lý sự kiện khi nhấp vào nút khôi phục
                         recoveryIcon.setOnMouseClicked((MouseEvent event) -> {
                             TaskData selectedTask = getTableView().getItems().get(getIndex());
 
-                            // Xác nhận khôi phục task
                             Alert alert = new Alert(Alert.AlertType.CONFIRMATION);
                             alert.setTitle("Confirmation");
                             alert.setHeaderText("Recover Task");
@@ -143,8 +169,10 @@ public class Delete implements Initializable {
 
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.OK) {
-                                removeTask(selectedTask);
-
+                                boolean success = removeTask(selectedTask);
+                                if (success) {
+                                    TrashShowData(); // Cập nhật lại ListView sau khi xóa thành công
+                                }
                             }
                         });
 
@@ -167,7 +195,7 @@ public class Delete implements Initializable {
         table_trashs.setItems(TrashList());
     }
 
-    public void removeTask(TaskData selected){
+    public boolean removeTask(TaskData selected) {
         try {
             String insertQuery = "INSERT INTO tasks (user_id,task, description, status, priority, create_at, due_date) " +
                     "SELECT user_id, task, description, status, priority, create_at, due_date " +
@@ -180,13 +208,24 @@ public class Delete implements Initializable {
 
             String deleteQuery = "DELETE FROM Trash WHERE task_id=?";
             preparedStatement = connect.prepareStatement(deleteQuery);
-            preparedStatement.setInt(1,selected.getTask_id());
+            preparedStatement.setInt(1, selected.getTask_id());
             preparedStatement.executeUpdate();
-            TrashShowData();
 
-        }catch (Exception e){
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Task recovered successfully");
+            return true;
+        } catch (Exception e) {
             e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to recover task");
+            return false;
         }
+    }
+
+    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){

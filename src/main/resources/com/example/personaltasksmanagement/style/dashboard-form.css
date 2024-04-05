@@ -80,3 +80,8 @@
 }
 
 
+.rounded-image-view {
+    -fx-border-radius: 50%;
+    -fx-background-radius: 50%;
+    -fx-border-color: transparent;
+}
