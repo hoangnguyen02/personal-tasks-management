@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="652.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Tasks">
+<AnchorPane prefHeight="652.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Tasks">
    <children>
       <AnchorPane layoutX="27.0" layoutY="25.0" prefHeight="601.0" prefWidth="1007.0" stylesheets="@../style/dashboard-form.css" visible="false">
          <styleClass>
@@ -50,7 +50,7 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <TextField fx:id="searchTextField" layoutX="44.0" layoutY="63.0" prefHeight="38.0" prefWidth="330.0" promptText="Search" style="-fx-background-color: transparent; -fx-border-color: black; -fx-border-width: 0px 0px 2px 0px;" />
+            <TextField fx:id="searchTextField" layoutX="44.0" layoutY="63.0" onAction="#action_search" prefHeight="38.0" prefWidth="330.0" promptText="Search" style="-fx-background-color: transparent; -fx-border-color: black; -fx-border-width: 0px 0px 2px 0px;" />
             <TableView fx:id="table_tasks" layoutX="44.0" layoutY="137.0" prefHeight="438.0" prefWidth="885.0" stylesheets="@../style/dashboard-form.css">
                <columns>
                   <TableColumn fx:id="taskColumn" prefWidth="122.0" text="Tasks" />

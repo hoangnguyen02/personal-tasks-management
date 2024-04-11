@@ -57,8 +57,6 @@ public class AddNewTask implements Initializable {
                 alert.setTitle("Error");
                 alert.setContentText("Please fill all blank fields");
                 alert.showAndWait();
-            } else if (statusComboBox.getValue().equalsIgnoreCase("Complete")) {
-                showAlert(Alert.AlertType.ERROR, "Error", "You cannot create a task with 'Complete' status");
             } else {
                 if (datePicket.getValue().isBefore(LocalDate.now().minusDays(1L))){
                     Alert alert = new Alert(Alert.AlertType.ERROR);
@@ -67,11 +65,21 @@ public class AddNewTask implements Initializable {
                     alert.showAndWait();
                 }else {
                     if (taskData == null){
-                        addTask();
+                        if (statusComboBox.getValue().equalsIgnoreCase("Complete")) {
+                            showAlert(Alert.AlertType.ERROR, "Error", "You cannot create a task with 'Complete' status");
+                        } else {
+                            addTask();
+                            ((Node) (event.getSource())).getScene().getWindow().hide();
+                        }
+
                     }else {
                         updateTask();
+                        if (statusComboBox.getValue().equalsIgnoreCase("Complete")) {
+                            removeTaskToComplete(taskData);
+                        }
+                        ((Node) (event.getSource())).getScene().getWindow().hide();
                     }
-                    ((Node) (event.getSource())).getScene().getWindow().hide();
+
 
                 }
             }
@@ -119,13 +127,39 @@ public class AddNewTask implements Initializable {
 
             if (rowsUpdated > 0) {
                 showAlert(Alert.AlertType.INFORMATION, "Success", "Task updated successfully");
-            } else {
+            }else {
                 showAlert(Alert.AlertType.WARNING, "Warning", "No task was updated. Please check the task details.");
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+    private void removeTaskToComplete(TaskData selected) {
+        try {
+            int userId = UserSession.getInstance().getUserId();
+
+            String insertQuery = "INSERT INTO complete (user_id, task_id, task, description, status, priority, completed_at) " +
+                    "SELECT ?, task_id, task, description, status, priority, ? " +
+                    "FROM tasks " +
+                    "WHERE task_id = ?";
+            PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
+            insertStatement.setInt(1, userId);
+            insertStatement.setDate(2, java.sql.Date.valueOf(LocalDate.now()));
+            insertStatement.setInt(3, selected.getTask_id());
+            insertStatement.executeUpdate();
+
+            String deleteQuery = "DELETE FROM tasks WHERE task_id=?";
+            PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);
+            deleteStatement.setInt(1, selected.getTask_id());
+            deleteStatement.executeUpdate();
+
+            showAlert(Alert.AlertType.INFORMATION, "Success", "Task moved to Completed successfully");
+        } catch (Exception e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Failed to move task to Completed");
+        }
+    }
+
     private ObservableList<String> getStatusName() {
         ObservableList<String> statusName = FXCollections.observableArrayList();
 

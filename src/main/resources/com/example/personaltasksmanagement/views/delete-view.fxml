@@ -9,7 +9,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="652.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Delete">
+<AnchorPane prefHeight="652.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Delete">
    <children>
       <AnchorPane layoutX="27.0" layoutY="25.0" prefHeight="601.0" prefWidth="1007.0" stylesheets="@../style/dashboard-form.css" visible="false">
          <styleClass>
@@ -50,15 +50,14 @@
                   <Font name="System Bold" size="18.0" />
                </font>
             </Label>
-            <TableView fx:id="table_trashs" layoutX="44.0" layoutY="74.0" prefHeight="501.0" prefWidth="886.0" stylesheets="@../style/dashboard-form.css">
+            <TableView fx:id="trash_table" layoutX="138.0" layoutY="63.0" prefHeight="502.0" prefWidth="757.0" stylesheets="@../style/dashboard-form.css">
                <columns>
                   <TableColumn fx:id="trashTask" prefWidth="122.0" text="Tasks" />
                   <TableColumn fx:id="trashDescription" prefWidth="200.0" text="Description" />
                   <TableColumn fx:id="trashStatus" prefWidth="100.0" text="Status" />
                   <TableColumn fx:id="trashPriority" prefWidth="100.0" text="Priority" />
-                  <TableColumn fx:id="trashCreate" prefWidth="135.0" text="Create At" />
-                  <TableColumn fx:id="trashDueDate" prefWidth="135.0" text="Due Date" />
-                  <TableColumn fx:id="trashAction" prefWidth="86.4000244140625" text="Action" />
+                  <TableColumn fx:id="trashDelete" prefWidth="135.0" text="Deleted At" />
+                  <TableColumn fx:id="trashAction" prefWidth="99.199951171875" text="Action" />
                </columns>
                <styleClass>
                   <String fx:value="table-row-cell" />

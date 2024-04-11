@@ -1,18 +1,24 @@
 package com.example.personaltasksmanagement.controllers;
 
+import com.example.personaltasksmanagement.Main;
 import com.example.personaltasksmanagement.database.DBConfig;
 import com.example.personaltasksmanagement.database.DBConnection;
 import com.example.personaltasksmanagement.models.UserSession;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
+import javafx.stage.Stage;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
@@ -125,14 +131,11 @@ public class Setting implements Initializable {
                 nameLabel.setText(resultSet.getString("full_name"));
                 userNameLabel.setText(resultSet.getString("username"));
                 createdLabel.setText(resultSet.getDate("date").toString());
-                // Lấy đường dẫn avatar từ cơ sở dữ liệu
                 String avatarPath = resultSet.getString("avatar_path");
                 if (avatarPath != null && !avatarPath.isEmpty()) {
-                    // Tạo đối tượng Image từ đường dẫn avatar
                     Image image = new Image(avatarPath);
                     user_imageView.setImage(image);
                 } else {
-                    // Nếu không có đường dẫn avatar, hiển thị một lỗi
                     showAlert(Alert.AlertType.ERROR, "Error", "Avatar not found", "Avatar path is null.");
                 }
                 nameTextField.setText(resultSet.getString("full_name"));
@@ -147,7 +150,6 @@ public class Setting implements Initializable {
     }
     public void submit_update() {
         try {
-            // Lấy thông tin từ các trường nhập liệu
             String fullName = nameTextField.getText();
             String userName = userNameTextField.getText();
             String mobilePhone = mobilePhoneTextField.getText();
@@ -179,9 +181,6 @@ public class Setting implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Error", "Database error", "An error occurred while updating your profile in the database.");
         }
     }
-
-
-
     public void changePass_action(){
         String oldPassword = oldPasswordField.getText();
         String newPassword = newPasswordField.getText();
@@ -227,6 +226,41 @@ public class Setting implements Initializable {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Change Password", "Error", "Database error occurred.");
         }
+    }
+    public void deleteAccount() {
+        Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
+        confirmationAlert.setTitle("Delete Account");
+        confirmationAlert.setHeaderText("Are you sure you want to delete your account?");
+        confirmationAlert.setContentText("This action cannot be undone.");
+
+        confirmationAlert.showAndWait().ifPresent(response -> {
+            if (response == ButtonType.OK) {
+                try (Connection connection = DriverManager.getConnection(DBConfig.JDBC_URL, DBConfig.JDBC_USER, DBConfig.JDBC_PASSWORD);
+                     PreparedStatement statement = connection.prepareStatement("DELETE FROM users WHERE user_id = ?")) {
+
+                    int loggedInUserId = UserSession.getInstance().getUserId();
+                    statement.setInt(1, loggedInUserId);
+
+                    int rowsAffected = statement.executeUpdate();
+
+                    if (rowsAffected > 0) {
+                        UserSession.getInstance().clearSession();
+                        Parent root = FXMLLoader.load(Main.class.getResource("views/controller-view.fxml"));
+                        Stage newStage = new Stage();
+                        Scene scene = new Scene(root);
+                        newStage.setScene(scene);
+                        newStage.show();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Delete Account", "Error", "Failed to delete account.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Delete Account", "Error", "Database error occurred.");
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
+        });
     }
 
     @FXML

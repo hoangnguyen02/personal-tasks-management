@@ -1,7 +1,6 @@
 package com.example.personaltasksmanagement.models;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 public class TaskData {
     private Integer task_id;
@@ -10,11 +9,13 @@ public class TaskData {
     private String description;
     private String status;
     private String priority;
-    private Date dueDate;
+    private LocalDate dueDate;
     private LocalDate createdDate;
+    private LocalDate complete;
+    private LocalDate delete;
 
     // Constructor
-    public TaskData(Integer task_id, Integer user_id, String task, String description, String status, String priority,LocalDate createdDate, Date dueDate) {
+    public TaskData(Integer task_id, Integer user_id, String task, String description, String status, String priority, LocalDate createdDate, LocalDate dueDate, LocalDate complete, LocalDate delete) {
         this.task_id = task_id;
         this.user_id = user_id;
         this.task = task;
@@ -23,7 +24,8 @@ public class TaskData {
         this.priority = priority;
         this.createdDate = createdDate;
         this.dueDate = dueDate;
-
+        this.complete = complete;
+        this.delete = delete;
     }
 
     // Getters
@@ -51,12 +53,20 @@ public class TaskData {
         return priority;
     }
 
-    public Date getDueDate() {
+    public LocalDate getDueDate() {
         return dueDate;
     }
 
     public LocalDate getCreatedDate() {
         return createdDate;
+    }
+
+    public LocalDate getComplete() {
+        return complete;
+    }
+
+    public LocalDate getDelete() {
+        return delete;
     }
 
     // Setters
@@ -84,12 +94,20 @@ public class TaskData {
         this.priority = priority;
     }
 
-    public void setDueDate(Date dueDate) {
+    public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
     }
 
     public void setCreatedDate(LocalDate createdDate) {
         this.createdDate = createdDate;
+    }
+
+    public void setComplete(LocalDate complete) {
+        this.complete = complete;
+    }
+
+    public void setDelete(LocalDate delete) {
+        this.delete = delete;
     }
 
     // toString method
@@ -104,6 +122,7 @@ public class TaskData {
                 ", priority=" + priority +
                 ", dueDate=" + dueDate +
                 ", createdDate=" + createdDate +
+                ", complete=" + complete +
                 '}';
     }
 }

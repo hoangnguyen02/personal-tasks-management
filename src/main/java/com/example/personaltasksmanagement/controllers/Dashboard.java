@@ -2,6 +2,7 @@ package com.example.personaltasksmanagement.controllers;
 
 import com.example.personaltasksmanagement.Main;
 import com.example.personaltasksmanagement.database.DBConnection;
+import com.example.personaltasksmanagement.models.Task;
 import com.example.personaltasksmanagement.models.UserSession;
 import javafx.application.Platform;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,6 +16,7 @@ import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
@@ -23,6 +25,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -36,37 +39,66 @@ public class Dashboard implements Initializable {
 
     @FXML
     private Button logoutButton;
+    @FXML
+    private Label labelEmail;
 
     @FXML
-    private TableColumn<?, ?> status_recent;
+    private Label labelName;
 
     @FXML
-    private TableView<Map.Entry<String, String>> table_recent;
+    private Label lableUsername;
 
     @FXML
-    private TableColumn<?, ?> title_recent;
+    private TableView<Task> table_recent;
+
+    @FXML
+    private TableColumn<Task, String> title_recent;
+
+    @FXML
+    private TableColumn<Task, String> status_recent;
 
 
     Connection connect = DBConnection.connectionDB();
-
-    public ObservableList<Map.Entry<String, String>> TaskRecentList() {
-        ObservableList<Map.Entry<String, String>> recentList = FXCollections.observableArrayList();
+    private void loadUserData() {
         try {
-            String query = "SELECT task, status FROM tasks ORDER BY create_at DESC LIMIT 10";
+            int userId = UserSession.getInstance().getUserId();
+            String selectQuery = "SELECT * FROM users WHERE user_id = ?";
+
+            Connection connect = DBConnection.connectionDB();
+            PreparedStatement preparedStatement = connect.prepareStatement(selectQuery);
+            preparedStatement.setInt(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                labelName.setText(resultSet.getString("full_name"));
+                lableUsername.setText(resultSet.getString("username"));
+                labelEmail.setText(resultSet.getString("email"));
+
+                labelName.setText(resultSet.getString("full_name"));
+                lableUsername.setText(resultSet.getString("username"));
+                labelEmail.setText(resultSet.getString("email"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public ObservableList<Task> getRecentTaskStatus() {
+        ObservableList<Task> recentTaskStatus = FXCollections.observableArrayList();
+        try {
+            String query =  "SELECT task, status FROM tasks ORDER BY create_at DESC LIMIT 5";
             PreparedStatement statement = connect.prepareStatement(query);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
                 String task = resultSet.getString("task");
                 String status = resultSet.getString("status");
-                Map.Entry<String, String> recentData = new AbstractMap.SimpleEntry<>(task, status);
-                recentList.add(recentData);
+                recentTaskStatus.add(new Task(task, status));
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
-
-        return recentList;
+        return recentTaskStatus;
     }
 
     //final
@@ -86,6 +118,7 @@ public class Dashboard implements Initializable {
                 }
             }
         }).start();
+
     }
     //final
     public void backToHome(ActionEvent event){
@@ -93,17 +126,12 @@ public class Dashboard implements Initializable {
         try {
             FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/dashboard-view.fxml"));
             Parent root = loader.load();
-
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-
             stage.setScene(new Scene(root));
-
-            // Hiển thị Stage
             stage.show();
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
 
     //final
@@ -161,6 +189,11 @@ public class Dashboard implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
+        loadUserData();
+        ObservableList<Task> taskStatusList = getRecentTaskStatus();
+        title_recent.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTask()));
+        status_recent.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
+        table_recent.setItems(taskStatusList);
 
         runTime();
     }

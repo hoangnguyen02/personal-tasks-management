@@ -1,13 +1,16 @@
 package com.example.personaltasksmanagement.controllers;
-import com.example.personaltasksmanagement.models.UserSession;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
-import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 
+import com.example.personaltasksmanagement.models.Task;
+import com.example.personaltasksmanagement.models.UserSession;
 import com.example.personaltasksmanagement.Main;
 import com.example.personaltasksmanagement.database.DBConnection;
 import com.example.personaltasksmanagement.models.TaskData;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -28,11 +31,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Optional;
-import java.util.ResourceBundle;
-import java.util.logging.Logger;
+import java.time.LocalDate;
+import java.util.*;
 
 public class Tasks implements Initializable {
     @FXML
@@ -61,54 +61,47 @@ public class Tasks implements Initializable {
 
     @FXML
     private TableColumn<TaskData, String> taskColumn;
+
     @FXML
     private TableView<TaskData> table_tasks;
 
     Connection connect = DBConnection.connectionDB();
 
-    public ObservableList<TaskData> TasksDataList(){
+    public ObservableList<TaskData> TasksDataList() {
         ObservableList<TaskData> listData = FXCollections.observableArrayList();
 
         String selectData = "SELECT * FROM tasks WHERE user_id = ?";
 
         try {
-
             PreparedStatement preparedStatement = connect.prepareStatement(selectData);
             preparedStatement.setInt(1, UserSession.getInstance().getUserId());
             ResultSet resultSet = preparedStatement.executeQuery();
 
-            TaskData taskData;
-            while (resultSet.next()){
-                taskData = new TaskData(resultSet.getInt("task_id"),
+            while (resultSet.next()) {
+                TaskData taskData = new TaskData(
+                        resultSet.getInt("task_id"),
                         resultSet.getInt("user_id"),
                         resultSet.getString("task"),
                         resultSet.getString("description"),
                         resultSet.getString("status"),
                         resultSet.getString("priority"),
-                        resultSet.getDate("create_at").toLocalDate(),
-                        resultSet.getDate("due_date"));
+                        resultSet.getDate("create_at").toLocalDate(), // Convert to LocalDate
+                        resultSet.getDate("due_date").toLocalDate(), // Convert to LocalDate
+                        null, // complete is null
+                        null); // delete is null
                 listData.add(taskData);
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return listData;
     }
-    private static Comparator<TaskData> PriorityComparator = new Comparator<TaskData>() {
-        @Override
-        public int compare(TaskData task1, TaskData task2){
-            if (task1.getPriority().equals("high")) {
-                return -1;
-            } else if (task1.getPriority().equals("low")) {
-                return 1;
-            } else {
-                return 0;
-            }
-        }
-    };
+
+    private static Comparator<TaskData> PriorityComparator = Comparator.comparing(TaskData::getPriority);
+
     public void TaskShowData() {
         ObservableList<TaskData> TaskListData = TasksDataList();
-        Collections.sort(TaskListData, PriorityComparator);
+        TaskListData.sort(PriorityComparator);
 
         taskColumn.setCellValueFactory(new PropertyValueFactory<>("task"));
         descriptionColumn.setCellValueFactory(new PropertyValueFactory<>("description"));
@@ -117,9 +110,6 @@ public class Tasks implements Initializable {
         createColumn.setCellValueFactory(new PropertyValueFactory<>("createdDate"));
         dueDateColumn.setCellValueFactory(new PropertyValueFactory<>("dueDate"));
 
-
-
-        // Tạo ô chứa nút chỉnh sửa và xóa
         Callback<TableColumn<TaskData, String>, TableCell<TaskData, String>> cellFactory = (TableColumn<TaskData, String> param) -> {
             final TableCell<TaskData, String> cell = new TableCell<TaskData, String>() {
                 @Override
@@ -144,13 +134,10 @@ public class Tasks implements Initializable {
                                         + "-fx-fill: #ff1744;"
                         );
 
-                        // Xử lý sự kiện khi nhấp vào nút chỉnh sửa
                         editIcon.setOnMouseClicked((MouseEvent event) -> {
                             try {
-                                // Lấy dữ liệu của task được chọn
                                 TaskData selectedTask = getTableView().getItems().get(getIndex());
 
-                                // Hiển thị cửa sổ chỉnh sửa task
                                 FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/add-new.fxml"));
                                 Parent root = loader.load();
                                 AddNewTask controller = loader.getController();
@@ -186,7 +173,6 @@ public class Tasks implements Initializable {
                             }
                         });
 
-                        // Tạo HBox chứa các nút chỉnh sửa và xóa
                         HBox actionBox = new HBox(editIcon, deleteIcon);
                         actionBox.setStyle("-fx-alignment: center;");
                         HBox.setMargin(editIcon, new Insets(2, 3, 0, 2));
@@ -205,34 +191,75 @@ public class Tasks implements Initializable {
 
         table_tasks.setItems(TaskListData);
     }
+
     private void deleteTask(TaskData selectedTask) {
         try {
-            String insertQuery = "INSERT INTO trash (user_id, task, description, status, priority, create_at, due_date) " +
-                    "SELECT user_id, task, description, status, priority, create_at, due_date " +
-                    "FROM tasks " +
-                    "WHERE task_id = ?";
+            // Insert task into trash table
+            String insertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_at) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
-            insertStatement.setInt(1, selectedTask.getTask_id());
+            insertStatement.setInt(1, selectedTask.getUser_id());
+            insertStatement.setInt(2, selectedTask.getTask_id());
+            insertStatement.setString(3, selectedTask.getTask());
+            insertStatement.setString(4, selectedTask.getDescription());
+            insertStatement.setString(5, selectedTask.getStatus());
+            insertStatement.setString(6, selectedTask.getPriority());
+            insertStatement.setDate(7, java.sql.Date.valueOf(LocalDate.now())); // Set delete_at as current date
             insertStatement.executeUpdate();
 
             String deleteQuery = "DELETE FROM tasks WHERE task_id = ?";
             PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);
             deleteStatement.setInt(1, selectedTask.getTask_id());
             deleteStatement.executeUpdate();
-            TasksDataList().remove(selectedTask);
+
+            TaskShowData();
         } catch (Exception e) {
+            e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "An error occurred: " + e.getMessage());
         }
     }
 
+    public void action_search() {
+
+        FilteredList<TaskData> filter = new FilteredList<>(TasksDataList(), e -> true);
+
+        searchTextField.textProperty().addListener((Observable, oldValue, newValue) -> {
+
+            filter.setPredicate(PrediateFlowerData -> {
+
+                if (newValue.isEmpty() || newValue == null) {
+                    return true;
+                }
+
+                String searchKey = newValue.toLowerCase();
+
+                if (PrediateFlowerData.getTask_id().toString().contains(searchKey)) {
+                    return true;
+                } else if (PrediateFlowerData.getTask().toString().toLowerCase().contains(searchKey)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            });
+
+        });
+
+        SortedList<TaskData> sortList = new SortedList<>(filter);
+
+        sortList.comparatorProperty().bind(table_tasks.comparatorProperty());
+
+        table_tasks.setItems(sortList);
+
+    }
 
 
     @Override
-    public void initialize(URL url, ResourceBundle resourceBundle){
-
+    public void initialize(URL url, ResourceBundle resourceBundle) {
         TaskShowData();
+        action_search();
     }
-    public void addTask(ActionEvent event) throws IOException{
+
+    public void addTask(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/add-new.fxml"));
         Parent root = loader.load();
 
@@ -244,6 +271,7 @@ public class Tasks implements Initializable {
 
         TaskShowData();
     }
+
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
