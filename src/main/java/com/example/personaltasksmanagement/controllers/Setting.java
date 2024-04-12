@@ -105,7 +105,6 @@ public class Setting implements Initializable {
                 if (rowsAffected > 0) {
                     showAlert(Alert.AlertType.INFORMATION, "Import Avatar", "Success", "Avatar updated successfully.");
                     UserSession.getInstance().setAvatarPath(relativePath);
-                    // Load lại dữ liệu người dùng để hiển thị thông tin cập nhật
                     loadUserData();
                 } else {
 

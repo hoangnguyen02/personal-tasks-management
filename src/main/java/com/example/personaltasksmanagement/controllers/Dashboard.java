@@ -18,9 +18,10 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.layout.StackPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -56,9 +57,155 @@ public class Dashboard implements Initializable {
 
     @FXML
     private TableColumn<Task, String> status_recent;
+    @FXML
+    private Button updateNote;
+    @FXML
+    private TextArea noteView_Dashboard;
+
+    @FXML
+    private Button buttonNote;
+
+    @FXML
+    private Button saveNote;
+    @FXML
+    private Button clearNote;
+    @FXML
+    private Label number_complete;
+
+    @FXML
+    private Label number_note;
+
+    @FXML
+    private Label number_total;
+    private File openedFile;
+    @FXML
+    private TextField title_note;
 
 
     Connection connect = DBConnection.connectionDB();
+    private void countCompleteTasks() {
+        try {
+            String query = "SELECT COUNT(*) FROM complete";
+            PreparedStatement statement = connect.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                number_complete.setText(String.valueOf(count));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void countNotes() {
+        try {
+            String query = "SELECT COUNT(*) FROM notes";
+            PreparedStatement statement = connect.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                number_note.setText(String.valueOf(count));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void countTotalTasks() {
+        try {
+            String query = "SELECT COUNT(*) FROM tasks";
+            PreparedStatement statement = connect.prepareStatement(query);
+            ResultSet resultSet = statement.executeQuery();
+
+            if (resultSet.next()) {
+                int count = resultSet.getInt(1);
+                number_total.setText(String.valueOf(count));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+    public void save_action(ActionEvent event){
+        if (openedFile != null) {
+            try {
+                FileWriter fileWriter = new FileWriter(openedFile);
+                fileWriter.write(noteView_Dashboard.getText());
+                fileWriter.close();
+                showAlert(Alert.AlertType.INFORMATION, "Success", "File saved successfully");
+            } catch (IOException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to save file: " + e.getMessage());
+            }
+        } else {
+            int userId = UserSession.getInstance().getUserId();
+            String titleContent = title_note.getText();
+            String noteContent = noteView_Dashboard.getText();
+
+            try {
+                String insertQuery = "INSERT INTO notes (user_id,title, content) VALUES (?, ?, ?)";
+                PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
+                insertStatement.setInt(1, userId);
+                insertStatement.setString(2, titleContent);
+                insertStatement.setString(3, noteContent);
+                insertStatement.executeUpdate();
+
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Note saved to database successfully");
+            } catch (SQLException e) {
+                e.printStackTrace();
+                showAlert(Alert.AlertType.ERROR, "Error", "Failed to save note to database: " + e.getMessage());
+            }
+        }
+    }
+
+    public void clear_action(){
+        title_note.clear();
+        noteView_Dashboard.clear();
+    }
+    public void import_action(ActionEvent event){
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Open Text File");
+        fileChooser.getExtensionFilters().addAll(
+                new FileChooser.ExtensionFilter("Text Files", "*.txt")
+        );
+        File selectedFile = fileChooser.showOpenDialog(null);
+
+        if (selectedFile != null) {
+            try {
+                String fileName = selectedFile.getName();
+                title_note.setText(fileName);
+                BufferedReader reader = new BufferedReader(new FileReader(selectedFile));
+                String line;
+                StringBuilder text = new StringBuilder();
+                while ((line = reader.readLine()) != null) {
+                    text.append(line).append("\n");
+                }
+                reader.close();
+                noteView_Dashboard.setText(text.toString());
+                openedFile = selectedFile;
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+//    public void update_action(ActionEvent event){
+//        if (openedFile != null) {
+//            String newText = noteView_Dashboard.getText();
+//
+//            try {
+//                FileWriter fileWriter = new FileWriter(openedFile);
+//                fileWriter.write(newText);
+//                fileWriter.close();
+//                showAlert(Alert.AlertType.INFORMATION, "Success", "File updated successfully");
+//            } catch (IOException e) {
+//                e.printStackTrace();
+//                showAlert(Alert.AlertType.ERROR, "Error", "Failed to update file: " + e.getMessage());
+//            }
+//        } else {
+//            showAlert(Alert.AlertType.WARNING, "Warning", "No file opened");
+//        }
+//    }
     private void loadUserData() {
         try {
             int userId = UserSession.getInstance().getUserId();
@@ -111,7 +258,7 @@ public class Dashboard implements Initializable {
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }
-                if (dateTime != null) { // Kiểm tra xem biến dateTime đã được khởi tạo chưa trước khi sử dụng
+                if (dateTime != null) {
                     Platform.runLater(() -> {
                         dateTime.setText(format.format(new Date()));
                     });
@@ -173,6 +320,12 @@ public class Dashboard implements Initializable {
         contentArea.getChildren().removeAll();
         contentArea.getChildren().setAll(root);
     }
+    public void loadNotePage(ActionEvent event) throws IOException{
+        FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/note-view.fxml"));
+        Parent root = loader.load();
+        contentArea.getChildren().removeAll();
+        contentArea.getChildren().setAll(root);
+    }
 
     public void loadDeletePage(ActionEvent event) throws IOException{
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/delete-view.fxml"));
@@ -189,12 +342,24 @@ public class Dashboard implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
+        countCompleteTasks();
+        countNotes();
+        countTotalTasks();
         loadUserData();
+        clear_action();
+
         ObservableList<Task> taskStatusList = getRecentTaskStatus();
         title_recent.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getTask()));
         status_recent.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getStatus()));
         table_recent.setItems(taskStatusList);
 
         runTime();
+    }
+    private void showAlert(Alert.AlertType alertType, String title, String content) {
+        Alert alert = new Alert(alertType);
+        alert.setTitle(title);
+        alert.setHeaderText(null);
+        alert.setContentText(content);
+        alert.showAndWait();
     }
 }

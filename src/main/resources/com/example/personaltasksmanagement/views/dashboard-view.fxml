@@ -7,6 +7,8 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
 <?import javafx.scene.image.Image?>
 <?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
@@ -39,17 +41,17 @@
                                     <Font name="System Bold" size="18.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="dateTime" layoutX="456.0" layoutY="16.0" prefHeight="20.0" prefWidth="184.0" text="MM/dd/yyyy">
+                              <Label fx:id="dateTime" layoutX="535.0" layoutY="15.0" prefHeight="20.0" prefWidth="184.0" text="MM/dd/yyyy">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Label layoutX="653.0" layoutY="16.0" text="Wellcome:">
+                              <Label layoutX="719.0" layoutY="16.0" text="Wellcome:">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
                               </Label>
-                              <Label fx:id="lableUsername" layoutX="734.0" layoutY="16.0" text="Username">
+                              <Label fx:id="lableUsername" layoutX="809.0" layoutY="16.0" text="Username">
                                  <font>
                                     <Font size="14.0" />
                                  </font>
@@ -64,7 +66,7 @@
                   <AnchorPane prefHeight="650.0" prefWidth="278.0" styleClass="bg-color-1" stylesheets="@../style/dashboard-form.css" BorderPane.alignment="CENTER">
                      <children>
                         <FontAwesomeIconView fill="WHITE" glyphName="USER" layoutX="106.0" layoutY="109.0" size="80" />
-                        <Label layoutX="12.0" layoutY="154.0" text="Full name:" textFill="WHITE">
+                        <Label layoutX="12.0" layoutY="154.0" text="Name:" textFill="WHITE">
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font>
@@ -77,17 +79,23 @@
                         <Button fx:id="buttonHome" layoutX="67.0" layoutY="265.0" mnemonicParsing="false" onAction="#backToHome" prefHeight="34.0" prefWidth="157.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Home" />
                         <Button fx:id="buttonTasks" layoutX="67.0" layoutY="325.0" mnemonicParsing="false" onAction="#loadTasksPage" prefHeight="34.0" prefWidth="157.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Tasks" />
                         <Button fx:id="buttonComplete" layoutX="67.0" layoutY="392.0" mnemonicParsing="false" onAction="#loadCompletePage" prefHeight="34.0" prefWidth="157.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Complete" />
-                        <Button fx:id="buttonTrash" layoutX="67.0" layoutY="463.0" mnemonicParsing="false" onAction="#loadDeletePage" prefHeight="34.0" prefWidth="157.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Trash" />
-                        <Button fx:id="setting" layoutX="68.0" layoutY="533.0" mnemonicParsing="false" onAction="#loadSettingPage" prefHeight="36.0" prefWidth="155.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Setting" />
+                        <Button fx:id="buttonTrash" layoutX="67.0" layoutY="454.0" mnemonicParsing="false" onAction="#loadDeletePage" prefHeight="34.0" prefWidth="157.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Trash" />
+                        <Button fx:id="setting" layoutX="24.0" layoutY="593.0" mnemonicParsing="false" onAction="#loadSettingPage" prefHeight="36.0" prefWidth="36.0" stylesheets="@../style/dashboard-form.css" />
                         <Line endX="100.0" layoutX="146.0" layoutY="223.0" startX="-100.0" stroke="WHITE" />
-                        <Label fx:id="labelName" layoutX="92.0" layoutY="155.0" text="Label" textFill="WHITE">
+                        <Label fx:id="labelName" layoutX="64.0" layoutY="154.0" text="Label" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font></Label>
-                        <Label fx:id="labelEmail" layoutX="66.0" layoutY="186.0" text="Label" textFill="WHITE">
+                        <Label fx:id="labelEmail" layoutX="64.0" layoutY="185.0" text="Label" textFill="WHITE">
                            <font>
                               <Font size="14.0" />
                            </font></Label>
+                        <ImageView fitHeight="34.0" fitWidth="27.0" layoutX="29.0" layoutY="597.0" pickOnBounds="true" preserveRatio="true">
+                           <image>
+                              <Image url="@../image/settings-icon-2048x2046-cw28eevx.png" />
+                           </image>
+                        </ImageView>
+                        <Button fx:id="buttonNote" layoutX="67.0" layoutY="519.0" mnemonicParsing="false" onAction="#loadNotePage" prefHeight="34.0" prefWidth="157.0" styleClass="btn-1" stylesheets="@../style/dashboard-form.css" text="Note" />
                      </children>
                   </AnchorPane>
                </left>
@@ -115,7 +123,7 @@
                                                 <Font size="18.0" />
                                              </font>
                                           </Label>
-                                          <Label layoutX="203.0" layoutY="14.0" prefHeight="27.0" prefWidth="30.0" text="0">
+                                          <Label fx:id="number_total" layoutX="203.0" layoutY="14.0" prefHeight="27.0" prefWidth="30.0" text="0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -128,17 +136,17 @@
                                           <String fx:value="radius" />
                                        </styleClass>
                                        <children>
-                                          <Label layoutX="129.0" layoutY="121.0" text="Delete">
+                                          <Label fx:id="number_complete" layoutX="205.0" layoutY="17.0" prefHeight="27.0" prefWidth="30.0" text="0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
                                           </Label>
-                                          <ImageView fitHeight="78.0" fitWidth="84.0" layoutX="21.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fitHeight="78.0" fitWidth="84.0" layoutX="14.0" layoutY="72.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../image/imcomplete.png" />
+                                                <Image url="@../image/complete.png" />
                                              </image>
                                           </ImageView>
-                                          <Label layoutX="205.0" layoutY="17.0" prefHeight="27.0" prefWidth="30.0" text="0">
+                                          <Label layoutX="143.0" layoutY="120.0" text="Conplete">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -151,17 +159,17 @@
                                           <String fx:value="radius" />
                                        </styleClass>
                                        <children>
-                                          <Label layoutX="130.0" layoutY="120.0" text="Conplete">
+                                          <Label fx:id="number_note" layoutX="202.0" layoutY="14.0" prefHeight="27.0" prefWidth="30.0" text="0">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
                                           </Label>
-                                          <ImageView fitHeight="78.0" fitWidth="84.0" layoutX="28.0" layoutY="70.0" pickOnBounds="true" preserveRatio="true">
+                                          <ImageView fitHeight="78.0" fitWidth="84.0" layoutX="22.0" layoutY="69.0" pickOnBounds="true" preserveRatio="true">
                                              <image>
-                                                <Image url="@../image/complete.png" />
+                                                <Image url="@../image/4021693.png" />
                                              </image>
                                           </ImageView>
-                                          <Label layoutX="202.0" layoutY="14.0" prefHeight="27.0" prefWidth="30.0" text="0">
+                                          <Label layoutX="137.0" layoutY="120.0" text="Note">
                                              <font>
                                                 <Font size="18.0" />
                                              </font>
@@ -182,14 +190,26 @@
                                           <Font size="18.0" />
                                        </font>
                                     </Label>
-                                    <TableView fx:id="table_recent" layoutX="25.0" layoutY="48.0" prefHeight="298.0" prefWidth="323.0">
+                                    <TableView fx:id="table_recent" layoutX="25.0" layoutY="52.0" prefHeight="298.0" prefWidth="357.0">
                                       <columns>
-                                        <TableColumn fx:id="title_recent" prefWidth="200.79999542236328" text="Title" />
-                                        <TableColumn fx:id="status_recent" prefWidth="122.39996337890625" text="Status" />
+                                        <TableColumn fx:id="title_recent" prefWidth="240.79996490478516" text="Title" />
+                                        <TableColumn fx:id="status_recent" prefWidth="116.79998168945315" text="Status" />
                                       </columns>
                                     </TableView>
-                                    <Separator layoutX="414.0" layoutY="41.0" orientation="VERTICAL" prefHeight="308.0" prefWidth="1.0" />
-                                    <AnchorPane layoutX="420.0" layoutY="41.0" prefHeight="310.0" prefWidth="520.0" />
+                                    <Separator layoutX="430.0" layoutY="6.0" orientation="VERTICAL" prefHeight="354.0" prefWidth="6.0" />
+                                    <AnchorPane layoutX="449.0" layoutY="41.0" prefHeight="310.0" prefWidth="491.0">
+                                       <children>
+                                          <TextArea fx:id="noteView_Dashboard" layoutX="23.0" layoutY="76.0" prefHeight="232.0" prefWidth="364.0" promptText="Note Content" />
+                                          <Button fx:id="saveNote" layoutX="422.0" layoutY="210.0" mnemonicParsing="false" onAction="#save_action" prefHeight="40.0" prefWidth="69.0" styleClass="bg-color-1" stylesheets="@../style/dashboard-form.css" text="Save" textFill="WHITE" />
+                                          <Button fx:id="importNote" layoutX="422.0" layoutY="21.0" mnemonicParsing="false" onAction="#import_action" prefHeight="40.0" prefWidth="69.0" styleClass="bg-color-1" stylesheets="@../style/dashboard-form.css" text="Import" textFill="WHITE" />
+                                          <Button fx:id="clearNote" layoutX="422.0" layoutY="268.0" mnemonicParsing="false" onAction="#clear_action" prefHeight="40.0" prefWidth="69.0" styleClass="bg-color-1" stylesheets="@../style/dashboard-form.css" text="Clear" textFill="WHITE" />
+                                          <TextField fx:id="title_note" layoutX="23.0" layoutY="22.0" prefHeight="37.0" prefWidth="364.0" promptText="Title" />
+                                       </children></AnchorPane>
+                                    <Label alignment="CENTER" layoutX="468.0" layoutY="14.0" styleClass="hearder-1" stylesheets="@../style/dashboard-form.css" text="Quick Note">
+                                       <font>
+                                          <Font size="18.0" />
+                                       </font>
+                                    </Label>
                                  </children>
                               </AnchorPane>
                               <AnchorPane prefHeight="650.0" prefWidth="988.0" visible="false" />

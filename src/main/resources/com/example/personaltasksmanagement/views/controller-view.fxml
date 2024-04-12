@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.StackPane?>
 <?import javafx.scene.text.Font?>
 
-<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="657.0" prefWidth="947.0" xmlns="http://javafx.com/javafx/17" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Controller">
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="657.0" prefWidth="947.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Controller">
    <children>
       <AnchorPane fx:id="main_form" prefHeight="200.0" prefWidth="200.0">
          <children>
@@ -24,9 +24,12 @@
                      <children>
                         <AnchorPane prefHeight="657.0" prefWidth="318.0">
                            <children>
-                              <Label layoutX="83.0" layoutY="236.0" text="Wellcome to Todo App" />
-                              <Label layoutX="48.0" layoutY="279.0" text="Create an account to save all schedules" />
-                              <Label layoutX="69.0" layoutY="336.0" text="and access them from anywhere." />
+                              <Label layoutX="48.0" layoutY="250.0" text="Wellcome to Todo App">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font></Label>
+                              <Label layoutX="42.0" layoutY="311.0" text="Create an account to save all schedules" />
+                              <Label layoutX="59.0" layoutY="329.0" text="and access them from anywhere." />
                               <ImageView fitHeight="154.0" fitWidth="174.0" layoutX="69.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../image/logo.png" />

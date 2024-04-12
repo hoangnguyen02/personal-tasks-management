@@ -79,8 +79,6 @@ public class AddNewTask implements Initializable {
                         }
                         ((Node) (event.getSource())).getScene().getWindow().hide();
                     }
-
-
                 }
             }
 
@@ -152,11 +150,8 @@ public class AddNewTask implements Initializable {
             PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);
             deleteStatement.setInt(1, selected.getTask_id());
             deleteStatement.executeUpdate();
-
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Task moved to Completed successfully");
         } catch (Exception e) {
             e.printStackTrace();
-            showAlert(Alert.AlertType.ERROR, "Error", "Failed to move task to Completed");
         }
     }
 

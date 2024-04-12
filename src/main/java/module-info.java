@@ -6,6 +6,13 @@ module com.example.personaltasksmanagement {
     requires java.sql;
     requires java.mail;
     requires de.jensd.fx.glyphs.fontawesome;
+    requires com.google.api.client.auth;
+    requires google.api.client;
+    requires com.google.api.client.json.gson;
+    requires com.google.api.client;
+    requires spring.beans;
+    requires spring.context;
+    requires spring.web;
 
 
     opens com.example.personaltasksmanagement to javafx.fxml;

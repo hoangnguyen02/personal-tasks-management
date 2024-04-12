@@ -1,6 +1,7 @@
 package com.example.personaltasksmanagement.controllers;
 
 import java.io.IOException;
+import java.security.GeneralSecurityException;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -85,6 +86,9 @@ public class Controller implements Initializable {
     @FXML
     private TextField usernameRegister;
 
+    public void loginGoogle() {
+
+    }
 
     public void registerAccount(){
         if (fullnameRegister.getText().isEmpty()

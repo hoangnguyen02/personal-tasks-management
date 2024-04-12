@@ -85,10 +85,10 @@ public class Tasks implements Initializable {
                         resultSet.getString("description"),
                         resultSet.getString("status"),
                         resultSet.getString("priority"),
-                        resultSet.getDate("create_at").toLocalDate(), // Convert to LocalDate
-                        resultSet.getDate("due_date").toLocalDate(), // Convert to LocalDate
-                        null, // complete is null
-                        null); // delete is null
+                        resultSet.getDate("create_at").toLocalDate(),
+                        resultSet.getDate("due_date").toLocalDate(),
+                        null,
+                        null);
                 listData.add(taskData);
             }
         } catch (Exception e) {
@@ -119,7 +119,6 @@ public class Tasks implements Initializable {
                         setGraphic(null);
                         setText(null);
                     } else {
-                        // Tạo icon cho các nút chỉnh sửa và xóa
                         FontAwesomeIconView editIcon = new FontAwesomeIconView(FontAwesomeIcon.PENCIL_SQUARE);
                         FontAwesomeIconView deleteIcon = new FontAwesomeIconView(FontAwesomeIcon.TRASH);
 
@@ -194,18 +193,32 @@ public class Tasks implements Initializable {
 
     private void deleteTask(TaskData selectedTask) {
         try {
-            // Insert task into trash table
-            String insertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_at) " +
+            int userId = UserSession.getInstance().getUserId();
+            // Insert necessary data into trash table
+            String trashInsertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_at) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
-            PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
-            insertStatement.setInt(1, selectedTask.getUser_id());
-            insertStatement.setInt(2, selectedTask.getTask_id());
-            insertStatement.setString(3, selectedTask.getTask());
-            insertStatement.setString(4, selectedTask.getDescription());
-            insertStatement.setString(5, selectedTask.getStatus());
-            insertStatement.setString(6, selectedTask.getPriority());
-            insertStatement.setDate(7, java.sql.Date.valueOf(LocalDate.now())); // Set delete_at as current date
-            insertStatement.executeUpdate();
+            PreparedStatement trashInsertStatement = connect.prepareStatement(trashInsertQuery);
+            trashInsertStatement.setInt(1, userId);
+            trashInsertStatement.setInt(2, selectedTask.getTask_id());
+            trashInsertStatement.setString(3, selectedTask.getTask());
+            trashInsertStatement.setString(4, selectedTask.getDescription());
+            trashInsertStatement.setString(5, selectedTask.getStatus());
+            trashInsertStatement.setString(6, selectedTask.getPriority());
+            trashInsertStatement.setDate(7, java.sql.Date.valueOf(LocalDate.now()));
+            trashInsertStatement.executeUpdate();
+
+            String tmpDeleteInsertQuery = "INSERT INTO tmpDelete (user_id, task_id, task, description, status, priority, create_at, due_date) " +
+                    "VALUES (?, ?, ?, ?, ?, ?, ?,?)";
+            PreparedStatement tmpDeleteInsertStatement = connect.prepareStatement(tmpDeleteInsertQuery);
+            tmpDeleteInsertStatement.setInt(1, userId);
+            tmpDeleteInsertStatement.setInt(2, selectedTask.getTask_id());
+            tmpDeleteInsertStatement.setString(3, selectedTask.getTask());
+            tmpDeleteInsertStatement.setString(4, selectedTask.getDescription());
+            tmpDeleteInsertStatement.setString(5, selectedTask.getStatus());
+            tmpDeleteInsertStatement.setString(6, selectedTask.getPriority());
+            tmpDeleteInsertStatement.setDate(7, java.sql.Date.valueOf(selectedTask.getCreatedDate()));
+            tmpDeleteInsertStatement.setDate(8, java.sql.Date.valueOf(selectedTask.getDueDate()));
+            tmpDeleteInsertStatement.executeUpdate();
 
             String deleteQuery = "DELETE FROM tasks WHERE task_id = ?";
             PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);

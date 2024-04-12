@@ -11,7 +11,6 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 
 import java.net.URL;
@@ -66,9 +65,9 @@ public class Delete implements Initializable {
                         resultSet.getString("description"),
                         resultSet.getString("status"),
                         resultSet.getString("priority"),
-                        null, // createdDate is null
-                        null, // dueDate is null
-                        null, // complete is null
+                        null,
+                        null,
+                        null,
                         resultSet.getDate("delete_at").toLocalDate());
                 listData.add(taskData);
             }
@@ -167,26 +166,56 @@ public class Delete implements Initializable {
 
     private boolean recoverTask(TaskData selectedTask) {
         try {
-            String insertQuery = "INSERT INTO tasks (user_id, task, description, status, priority, create_at, due_date) " +
-                    "SELECT user_id, task, description, status, priority, create_at, due_date " +
-                    "FROM trash WHERE task_id = ?";
-            PreparedStatement preparedStatement = connect.prepareStatement(insertQuery);
-            preparedStatement.setInt(1, selectedTask.getTask_id());
-            preparedStatement.executeUpdate();
+            int userId = UserSession.getInstance().getUserId();
 
-            String deleteQuery = "DELETE FROM Trash WHERE task_id=?";
-            preparedStatement = connect.prepareStatement(deleteQuery);
-            preparedStatement.setInt(1, selectedTask.getTask_id());
-            preparedStatement.executeUpdate();
+            String selectQuery = "SELECT task, description, status, priority, create_at, due_date FROM tmpDelete WHERE task_id = ?";
+            PreparedStatement selectStatement = connect.prepareStatement(selectQuery);
+            selectStatement.setInt(1, selectedTask.getTask_id());
+            ResultSet resultSet = selectStatement.executeQuery();
 
-            showAlert(Alert.AlertType.INFORMATION, "Success", "Task recovered successfully");
-            return true;
+            if (resultSet.next()) {
+                String task = resultSet.getString("task");
+                String description = resultSet.getString("description");
+                String status = resultSet.getString("status");
+                String priority = resultSet.getString("priority");
+                LocalDate createAt = resultSet.getDate("create_at").toLocalDate();
+                LocalDate dueDate = resultSet.getDate("due_date").toLocalDate();
+
+                String insertQuery = "INSERT INTO tasks (user_id, task, description, status, priority, create_at, due_date) " +
+                        "VALUES (?, ?, ?, ?, ?, ?, ?)";
+                PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
+                insertStatement.setInt(1, userId);
+                insertStatement.setString(2, task);
+                insertStatement.setString(3, description);
+                insertStatement.setString(4, status);
+                insertStatement.setString(5, priority);
+                insertStatement.setDate(6, Date.valueOf(createAt));
+                insertStatement.setDate(7, Date.valueOf(dueDate));
+                insertStatement.executeUpdate();
+
+                String deleteQuery = "DELETE FROM tmpDelete WHERE task_id=?";
+                PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);
+                deleteStatement.setInt(1, selectedTask.getTask_id());
+                deleteStatement.executeUpdate();
+
+                showAlert(Alert.AlertType.INFORMATION, "Success", "Task recovered successfully");
+                return true;
+            } else {
+                showAlert(Alert.AlertType.WARNING, "Warning", "Task not found in tmpDelete");
+                return false;
+            }
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to recover task");
             return false;
         }
     }
+
+
+
+
+
+
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);

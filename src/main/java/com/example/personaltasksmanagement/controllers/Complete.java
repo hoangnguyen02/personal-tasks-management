@@ -66,7 +66,7 @@ public class Complete implements Initializable {
                         resultSet.getString("priority"),
                         null,
                         null,
-                        resultSet.getDate("completed_at").toLocalDate(), // Convert to LocalDate
+                        resultSet.getDate("completed_at").toLocalDate(),
                         null);
                 listData.add(taskData);
             }
