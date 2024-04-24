@@ -68,7 +68,7 @@ public class Delete implements Initializable {
                         null,
                         null,
                         null,
-                        resultSet.getDate("delete_at").toLocalDate());
+                        resultSet.getDate("delete_date").toLocalDate());
                 listData.add(taskData);
             }
         } catch (Exception e) {
@@ -168,7 +168,7 @@ public class Delete implements Initializable {
         try {
             int userId = UserSession.getInstance().getUserId();
 
-            String selectQuery = "SELECT task, description, status, priority, create_at, due_date FROM tmpDelete WHERE task_id = ?";
+            String selectQuery = "SELECT task, description, status, priority, create_date, due_date FROM tmpTrash WHERE task_id = ?";
             PreparedStatement selectStatement = connect.prepareStatement(selectQuery);
             selectStatement.setInt(1, selectedTask.getTask_id());
             ResultSet resultSet = selectStatement.executeQuery();
@@ -178,10 +178,10 @@ public class Delete implements Initializable {
                 String description = resultSet.getString("description");
                 String status = resultSet.getString("status");
                 String priority = resultSet.getString("priority");
-                LocalDate createAt = resultSet.getDate("create_at").toLocalDate();
+                LocalDate createDate = resultSet.getDate("create_date").toLocalDate();
                 LocalDate dueDate = resultSet.getDate("due_date").toLocalDate();
 
-                String insertQuery = "INSERT INTO tasks (user_id, task, description, status, priority, create_at, due_date) " +
+                String insertQuery = "INSERT INTO tasks (user_id, task, description, status, priority, create_date, due_date) " +
                         "VALUES (?, ?, ?, ?, ?, ?, ?)";
                 PreparedStatement insertStatement = connect.prepareStatement(insertQuery);
                 insertStatement.setInt(1, userId);
@@ -189,7 +189,7 @@ public class Delete implements Initializable {
                 insertStatement.setString(3, description);
                 insertStatement.setString(4, status);
                 insertStatement.setString(5, priority);
-                insertStatement.setDate(6, Date.valueOf(createAt));
+                insertStatement.setDate(6, Date.valueOf(createDate));
                 insertStatement.setDate(7, Date.valueOf(dueDate));
                 insertStatement.executeUpdate();
 

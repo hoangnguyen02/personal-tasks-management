@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.text.Font?>
+
+<AnchorPane prefHeight="421.0" prefWidth="735.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.FeedBack">
+   <children>
+      <Label layoutX="31.0" layoutY="22.0" text="Enter your feedback">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="65.0" layoutY="72.0" text="Summarize your feedback">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <Label layoutX="64.0" layoutY="184.0" text="Explain in more detail (Optional)">
+         <font>
+            <Font size="14.0" />
+         </font>
+      </Label>
+      <TextField fx:id="feedBack_name" layoutX="64.0" layoutY="115.0" prefHeight="38.0" prefWidth="629.0" />
+      <TextArea fx:id="feedBack_details" layoutX="64.0" layoutY="231.0" prefHeight="87.0" prefWidth="630.0" text="Give us much detail as you can. " />
+      <Button fx:id="sendButton" layoutX="639.0" layoutY="351.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="54.0" text="Send" />
+      <Button fx:id="cancelButton" layoutX="559.0" layoutY="351.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="54.0" text="Cancel" />
+   </children>
+</AnchorPane>

@@ -65,7 +65,7 @@ public class AddNewTask implements Initializable {
                     alert.showAndWait();
                 }else {
                     if (taskData == null){
-                        if (statusComboBox.getValue().equalsIgnoreCase("Complete")) {
+                        if (statusComboBox.getValue().equalsIgnoreCase("Complete!")) {
                             showAlert(Alert.AlertType.ERROR, "Error", "You cannot create a task with 'Complete' status");
                         } else {
                             addTask();
@@ -74,7 +74,7 @@ public class AddNewTask implements Initializable {
 
                     }else {
                         updateTask();
-                        if (statusComboBox.getValue().equalsIgnoreCase("Complete")) {
+                        if (statusComboBox.getValue().equalsIgnoreCase("Complete!")) {
                             removeTaskToComplete(taskData);
                         }
                         ((Node) (event.getSource())).getScene().getWindow().hide();
@@ -88,7 +88,7 @@ public class AddNewTask implements Initializable {
     }
     public void addTask(){
        try {
-           String insertData = "INSERT INTO tasks (user_id, task, description, status, priority, create_at, due_date) VALUES (?,?,?,?,?,?,?)";
+           String insertData = "INSERT INTO tasks (user_id, task, description, status, priority, create_date, due_date) VALUES (?,?,?,?,?,?,?)";
            PreparedStatement preparedStatement = connect.prepareStatement(insertData);
            preparedStatement.setInt(1, UserSession.getInstance().getUserId());
            preparedStatement.setString(2, taskTextField.getText());
@@ -136,7 +136,7 @@ public class AddNewTask implements Initializable {
         try {
             int userId = UserSession.getInstance().getUserId();
 
-            String insertQuery = "INSERT INTO complete (user_id, task_id, task, description, status, priority, completed_at) " +
+            String insertQuery = "INSERT INTO complete (user_id, task_id, task, description, status, priority, complete_date) " +
                     "SELECT ?, task_id, task, description, status, priority, ? " +
                     "FROM tasks " +
                     "WHERE task_id = ?";
@@ -158,7 +158,7 @@ public class AddNewTask implements Initializable {
     private ObservableList<String> getStatusName() {
         ObservableList<String> statusName = FXCollections.observableArrayList();
 
-        String selectStatusName = "SELECT statusname FROM status";
+        String selectStatusName = "SELECT status_name FROM status";
         Connection connect = DBConnection.connectionDB();
 
         try {
@@ -166,7 +166,7 @@ public class AddNewTask implements Initializable {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()){
-                statusName.add(resultSet.getString("statusname"));
+                statusName.add(resultSet.getString("status_name"));
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -178,7 +178,7 @@ public class AddNewTask implements Initializable {
     private ObservableList<String> getPriorityName() {
         ObservableList<String> priorityName = FXCollections.observableArrayList();
 
-        String selectPriorityName = "SELECT priorityname FROM priority";
+        String selectPriorityName = "SELECT priority_name FROM priority";
         Connection connect = DBConnection.connectionDB();
 
         try {
@@ -186,7 +186,7 @@ public class AddNewTask implements Initializable {
             ResultSet resultSet = preparedStatement.executeQuery();
 
             while (resultSet.next()){
-                priorityName.add(resultSet.getString("priorityname"));
+                priorityName.add(resultSet.getString("priority_name"));
             }
         } catch (Exception e) {
             e.printStackTrace();

@@ -2,6 +2,7 @@
 
 <?import java.lang.String?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Hyperlink?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.TextField?>
@@ -35,11 +36,16 @@
                   <Font name="System Bold" size="14.0" />
                </font>
             </Label>
-            <Button fx:id="deleteAccount" layoutX="103.0" layoutY="539.0" mnemonicParsing="false" style="-fx-background-color: red;" text="Delete Account" textFill="WHITE" />
+            <Button fx:id="deleteAccount" layoutX="100.0" layoutY="528.0" mnemonicParsing="false" onAction="#deleteAccount_action" style="-fx-background-color: red;" text="Delete Account" textFill="WHITE" />
             <Label fx:id="nameLabel" layoutX="103.0" layoutY="291.0" text="Label" />
             <Label fx:id="userNameLabel" layoutX="103.0" layoutY="333.0" text="Label" />
             <Label fx:id="createdLabel" layoutX="103.0" layoutY="380.0" text="Label" />
             <ImageView fx:id="user_imageView" fitHeight="150.0" fitWidth="146.0" layoutX="76.0" layoutY="38.0" pickOnBounds="true" preserveRatio="true" styleClass="rounded-image-view" />
+            <Hyperlink fx:id="feedBack" layoutX="107.0" layoutY="557.0" onAction="#feedBack_action" prefHeight="28.0" prefWidth="84.0" text="feed back?">
+               <font>
+                  <Font size="15.0" />
+               </font>
+            </Hyperlink>
          </children>
       </AnchorPane>
       <AnchorPane fx:id="profile_form" layoutX="372.0" layoutY="26.0" prefHeight="599.0" prefWidth="594.0" stylesheets="@../style/dashboard-form.css">

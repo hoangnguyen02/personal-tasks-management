@@ -2,6 +2,8 @@ package com.example.personaltasksmanagement.controllers;
 
 import java.io.IOException;
 import java.security.GeneralSecurityException;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Date;
 
@@ -131,6 +133,7 @@ public class Controller implements Initializable {
                     alert.showAndWait();
                 }
                 else {
+                    String hashedPassword = hashPassword(passwordRegister.getText());
                     String insertData = "INSERT INTO users (full_name, email, username, password, date) VALUES(?,?,?,?,?)";
 
                     Date date = new Date();
@@ -141,7 +144,8 @@ public class Controller implements Initializable {
                         preparedStatement.setString(1, fullnameRegister.getText());
                         preparedStatement.setString(2, emailRegister.getText());
                         preparedStatement.setString(3, usernameRegister.getText());
-                        preparedStatement.setString(4, passwordRegister.getText());
+                        preparedStatement.setString(4, hashedPassword);
+
 
                         preparedStatement.setString(5, String.valueOf(sqlDate));
 
@@ -192,43 +196,57 @@ public class Controller implements Initializable {
 
 
     public void loginAccount() throws SQLException {
-        if(loginUsername.getText().isEmpty() && loginPassword.getText().isEmpty()){
+        if (loginUsername.getText().isEmpty() && loginPassword.getText().isEmpty()) {
             Alert alert = new Alert(Alert.AlertType.ERROR);
             alert.setTitle("Error!");
             alert.setContentText("Incorrect Username/Password");
             alert.showAndWait();
-        }else {
-            String sql = "SELECT * FROM users WHERE username = ? AND password = ?";
+        } else {
             Connection connect = DBConnection.connectionDB();
 
             try {
-                PreparedStatement preparedStatement = connect.prepareStatement(sql);
-                preparedStatement.setString(1, loginUsername.getText());
-                preparedStatement.setString(2, loginPassword.getText());
+                // Kiểm tra trong bảng admins trước
+                String adminSql = "SELECT * FROM admin WHERE username = ? AND password = ?";
+                PreparedStatement adminStatement = connect.prepareStatement(adminSql);
+                adminStatement.setString(1, loginUsername.getText());
+                adminStatement.setString(2, loginPassword.getText());
 
-                ResultSet resultSet = preparedStatement.executeQuery();
+                ResultSet adminResultSet = adminStatement.executeQuery();
 
-                if (resultSet.next()){
-                    try {
-                        int userId = resultSet.getInt("user_id"); ;
+                if (adminResultSet.next()) {
+                    // Nếu là quản trị viên, chuyển đến giao diện quản lý
+                    FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/admin-view.fxml"));
+                    Parent root = loader.load();
+                    Stage stage = (Stage) buttonLogin.getScene().getWindow();
+                    stage.setScene(new Scene(root, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
+                } else {
+                    // Nếu không phải quản trị viên, kiểm tra trong bảng users
+                    String userSql = "SELECT * FROM users WHERE username = ? AND password = ?";
+                    PreparedStatement userStatement = connect.prepareStatement(userSql);
+                    userStatement.setString(1, loginUsername.getText());
+                    userStatement.setString(2, hashPassword(loginPassword.getText()));
+
+                    ResultSet userResultSet = userStatement.executeQuery();
+
+                    if (userResultSet.next()) {
+                        // Nếu là người dùng thông thường, chuyển đến giao diện người dùng
+                        int userId = userResultSet.getInt("user_id");
                         UserSession.getInstance().setUserId(userId);
 
-                        FXMLLoader loader =new FXMLLoader(Main.class.getResource("views/dashboard-view.fxml"));
-                        Parent root =loader.load();
+                        FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/dashboard-view.fxml"));
+                        Parent root = loader.load();
                         Stage stage = (Stage) buttonLogin.getScene().getWindow();
                         stage.setScene(new Scene(root, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
-                    }catch (Exception e){
-                        e.printStackTrace();
+                    } else {
+                        Alert alert = new Alert(Alert.AlertType.ERROR);
+                        alert.setTitle("Error!");
+                        alert.setContentText("Incorrect Username/Password");
+                        alert.showAndWait();
                     }
-
-                }else {
-                    Alert alert = new Alert(Alert.AlertType.ERROR);
-                    alert.setTitle("Error!");
-                    alert.setContentText("Incorrect Username/ Password");
-                    alert.showAndWait();
                 }
+
                 connect.close();
-            }catch (Exception e){
+            } catch (Exception e) {
                 e.printStackTrace();
             }
         }
@@ -249,6 +267,21 @@ public class Controller implements Initializable {
         register_form.setVisible(true);
     }
 
+    public String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : messageDigest) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
+    }
     public void forgetPassword(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/forget-view.fxml"));
         Parent root = loader.load();

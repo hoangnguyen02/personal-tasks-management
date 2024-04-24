@@ -7,6 +7,7 @@ import de.jensd.fx.glyphs.fontawesome.FontAwesomeIcon;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
@@ -37,6 +38,7 @@ public class Note implements Initializable {
     private Button saveButton;
 
 
+
     Connection connect = DBConnection.connectionDB();
 
     public void clear_action() {
@@ -64,7 +66,7 @@ public class Note implements Initializable {
 
     }
 
-    public void save_action(){
+    public void save_action(ActionEvent event){
         NoteData selectedItem = listNote.getSelectionModel().getSelectedItem();
         if (selectedItem != null) {
             String updateQuery = "UPDATE notes SET content = ? WHERE title = ?";
@@ -75,7 +77,9 @@ public class Note implements Initializable {
                 int affectedRows = preparedStatement.executeUpdate();
                 if (affectedRows > 0) {
                     selectedItem.setContent(AreaContent.getText());
-                    showAlert(Alert.AlertType.INFORMATION, "Success", "Note update successfully");
+                    showAlert(Alert.AlertType.INFORMATION, "Success", "Note updated successfully");
+                } else {
+                    showAlert(Alert.AlertType.ERROR, "Error", "Failed to update note");
                 }
             } catch (SQLException e) {
                 showAlert(Alert.AlertType.ERROR, "Error", "Failed to save note");
@@ -83,6 +87,7 @@ public class Note implements Initializable {
             }
         }
     }
+
     public ObservableList<NoteData> NoteDataList() {
         ObservableList<NoteData> listDataNote = FXCollections.observableArrayList();
         String selectQuery = "SELECT title, content FROM notes WHERE user_id = ?";
@@ -124,8 +129,7 @@ public class Note implements Initializable {
         ObservableList<NoteData> notes = NoteDataList();
         populateListView(notes);
         setupListViewListener();
-        delete_action();
-        save_action();
+        listNote.setEditable(true);
 
         listNote.setItems(notes);
         listNote.setCellFactory(param -> new ListCell<NoteData>() {
@@ -134,11 +138,32 @@ public class Note implements Initializable {
             {
                 textField.setEditable(false);
 
-
                 textField.setOnMouseClicked(event -> {
                     if (event.getClickCount() == 2) {
                         textField.setEditable(true);
                         textField.requestFocus();
+                    }
+                });
+
+                textField.setOnAction(event -> {
+                    // Khi người dùng kết thúc chỉnh sửa trong TextField
+                    NoteData item = getItem();
+                    if (item != null) {
+                        item.setTitle(textField.getText()); // Cập nhật tiêu đề của mục với giá trị mới từ TextField
+                        commitEdit(item); // Cập nhật mục trong ListView
+                        textField.setEditable(false); // Ngăn chặn việc chỉnh sửa tiếp theo
+                    }
+                });
+
+                textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
+                    // Khi TextField không còn được focus nữa
+                    if (!newValue) {
+                        NoteData item = getItem();
+                        if (item != null) {
+                            item.setTitle(textField.getText()); // Cập nhật tiêu đề của mục với giá trị mới từ TextField
+                            commitEdit(item); // Cập nhật mục trong ListView
+                            textField.setEditable(false); // Ngăn chặn việc chỉnh sửa tiếp theo
+                        }
                     }
                 });
 
@@ -152,6 +177,7 @@ public class Note implements Initializable {
                                 + "-fx-max-height: 50px;" // Đặt kích thước maxHeight
                 );
             }
+
             @Override
             public void updateItem(NoteData item, boolean empty) {
                 super.updateItem(item, empty);
@@ -164,7 +190,7 @@ public class Note implements Initializable {
             }
         });
     }
-    private void showAlert(Alert.AlertType alertType, String title, String message) {
+        private void showAlert(Alert.AlertType alertType, String title, String message) {
         Alert alert = new Alert(alertType);
         alert.setTitle(title);
         alert.setHeaderText(null);

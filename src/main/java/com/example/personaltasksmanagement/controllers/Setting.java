@@ -8,6 +8,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
+import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -22,6 +23,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.sql.*;
 import java.util.ResourceBundle;
 
@@ -70,6 +73,8 @@ public class Setting implements Initializable {
 
     @FXML
     private PasswordField repeatNewPasswordField;
+    @FXML
+    private Hyperlink feedBack;
 
     @FXML
     private Button submitChangePass;
@@ -85,6 +90,22 @@ public class Setting implements Initializable {
 
     @FXML
     private ImageView user_imageView;
+
+    @FXML
+    private void feedBack_action(ActionEvent event) {
+        try {
+            Parent feedbackView = FXMLLoader.load(Main.class.getResource("views/feedback-view.fxml"));
+            Scene feedbackScene = new Scene(feedbackView);
+
+            Stage feedbackStage = new Stage();
+            feedbackStage.setScene(feedbackScene);
+            feedbackStage.setTitle("Feedback");
+            feedbackStage.show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            showAlert(Alert.AlertType.ERROR, "Error", "Feedback View Error", "Failed to open Feedback View.");
+        }
+    }
 
     public void importAvt() {
         FileChooser open = new FileChooser();
@@ -134,8 +155,6 @@ public class Setting implements Initializable {
                 if (avatarPath != null && !avatarPath.isEmpty()) {
                     Image image = new Image(avatarPath);
                     user_imageView.setImage(image);
-                } else {
-                    showAlert(Alert.AlertType.ERROR, "Error", "Avatar not found", "Avatar path is null.");
                 }
                 nameTextField.setText(resultSet.getString("full_name"));
                 userNameTextField.setText(resultSet.getString("username"));
@@ -180,11 +199,10 @@ public class Setting implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Error", "Database error", "An error occurred while updating your profile in the database.");
         }
     }
-    public void changePass_action(){
+    public void changePass_action() {
         String oldPassword = oldPasswordField.getText();
         String newPassword = newPasswordField.getText();
         String repeatNewPassword = repeatNewPasswordField.getText();
-
 
         int loggedInUserId = UserSession.getInstance().getUserId();
 
@@ -192,20 +210,28 @@ public class Setting implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Change Password", "Error", "New passwords do not match.");
             return;
         }
+
         try (Connection connection = DriverManager.getConnection(DBConfig.JDBC_URL, DBConfig.JDBC_USER, DBConfig.JDBC_PASSWORD);
              PreparedStatement statement = connection.prepareStatement("SELECT password FROM users WHERE user_id = ?")) {
 
-            statement.setInt(1,  loggedInUserId);
+            statement.setInt(1, loggedInUserId);
             try (ResultSet resultSet = statement.executeQuery()) {
                 if (resultSet.next()) {
                     String currentPassword = resultSet.getString("password");
-                    if (!currentPassword.equals(oldPassword)) {
+
+                    // Mã hóa mật khẩu cũ trước khi so sánh
+                    String hashedOldPassword = hashPassword(oldPassword);
+
+                    if (!currentPassword.equals(hashedOldPassword)) {
                         showAlert(Alert.AlertType.ERROR, "Change Password", "Error", "Incorrect old password.");
                         return;
                     }
 
+                    // Mã hóa mật khẩu mới trước khi cập nhật
+                    String hashedNewPassword = hashPassword(newPassword);
+
                     try (PreparedStatement updateStatement = connection.prepareStatement("UPDATE users SET password = ? WHERE user_id = ?")) {
-                        updateStatement.setString(1, newPassword);
+                        updateStatement.setString(1, hashedNewPassword);
                         updateStatement.setInt(2, loggedInUserId);
                         int rowsAffected = updateStatement.executeUpdate();
                         if (rowsAffected > 0) {
@@ -217,7 +243,6 @@ public class Setting implements Initializable {
                         }
                     }
                 } else {
-
                     showAlert(Alert.AlertType.ERROR, "Change Password", "Error", "User not found.");
                 }
             }
@@ -226,7 +251,7 @@ public class Setting implements Initializable {
             showAlert(Alert.AlertType.ERROR, "Change Password", "Error", "Database error occurred.");
         }
     }
-    public void deleteAccount() {
+    public void deleteAccount_action(ActionEvent event) {
         Alert confirmationAlert = new Alert(Alert.AlertType.CONFIRMATION);
         confirmationAlert.setTitle("Delete Account");
         confirmationAlert.setHeaderText("Are you sure you want to delete your account?");
@@ -244,6 +269,12 @@ public class Setting implements Initializable {
 
                     if (rowsAffected > 0) {
                         UserSession.getInstance().clearSession();
+
+                        // Đóng cửa sổ hiện tại
+                        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+                        stage.close();
+
+                        // Tạo và hiển thị cửa sổ mới cho trang đăng nhập
                         Parent root = FXMLLoader.load(Main.class.getResource("views/controller-view.fxml"));
                         Stage newStage = new Stage();
                         Scene scene = new Scene(root);
@@ -271,6 +302,22 @@ public class Setting implements Initializable {
     public void switchToProfile(ActionEvent event) {
         profile_form.setVisible(true);
         changePass_form.setVisible(false);
+    }
+
+    public static String hashPassword(String password) {
+        try {
+            MessageDigest md = MessageDigest.getInstance("MD5");
+            byte[] messageDigest = md.digest(password.getBytes());
+            StringBuilder hexString = new StringBuilder();
+            for (byte b : messageDigest) {
+                String hex = Integer.toHexString(0xff & b);
+                if (hex.length() == 1) hexString.append('0');
+                hexString.append(hex);
+            }
+            return hexString.toString();
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

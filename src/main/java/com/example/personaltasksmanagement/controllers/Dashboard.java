@@ -84,9 +84,11 @@ public class Dashboard implements Initializable {
 
     Connection connect = DBConnection.connectionDB();
     private void countCompleteTasks() {
+        int userId = UserSession.getInstance().getUserId();
         try {
-            String query = "SELECT COUNT(*) FROM complete";
+            String query = "SELECT COUNT(*) FROM complete WHERE user_id = ?";
             PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -99,9 +101,11 @@ public class Dashboard implements Initializable {
     }
 
     private void countNotes() {
+        int userId = UserSession.getInstance().getUserId();
         try {
-            String query = "SELECT COUNT(*) FROM notes";
+            String query = "SELECT COUNT(*) FROM notes WHERE user_id = ?";
             PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -114,9 +118,11 @@ public class Dashboard implements Initializable {
     }
 
     private void countTotalTasks() {
+        int userId = UserSession.getInstance().getUserId();
         try {
-            String query = "SELECT COUNT(*) FROM tasks";
+            String query = "SELECT COUNT(*) FROM tasks WHERE user_id = ?";
             PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
 
             if (resultSet.next()) {
@@ -127,6 +133,7 @@ public class Dashboard implements Initializable {
             e.printStackTrace();
         }
     }
+
     public void save_action(ActionEvent event){
         if (openedFile != null) {
             try {
@@ -231,10 +238,12 @@ public class Dashboard implements Initializable {
     }
 
     public ObservableList<Task> getRecentTaskStatus() {
+        int userId = UserSession.getInstance().getUserId();
         ObservableList<Task> recentTaskStatus = FXCollections.observableArrayList();
         try {
-            String query =  "SELECT task, status FROM tasks ORDER BY create_at DESC LIMIT 5";
+            String query = "SELECT task, status FROM tasks WHERE user_id = ? ORDER BY create_date DESC LIMIT 5";
             PreparedStatement statement = connect.prepareStatement(query);
+            statement.setInt(1, userId);
             ResultSet resultSet = statement.executeQuery();
 
             while (resultSet.next()) {
@@ -247,6 +256,7 @@ public class Dashboard implements Initializable {
         }
         return recentTaskStatus;
     }
+
 
     //final
     public void runTime() {

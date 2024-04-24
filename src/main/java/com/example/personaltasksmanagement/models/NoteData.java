@@ -1,7 +1,6 @@
 package com.example.personaltasksmanagement.models;
 
 public class NoteData {
-    private int noteId;
     private String title;
     private String content;
 

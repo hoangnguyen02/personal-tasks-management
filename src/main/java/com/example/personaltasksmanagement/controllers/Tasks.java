@@ -85,7 +85,7 @@ public class Tasks implements Initializable {
                         resultSet.getString("description"),
                         resultSet.getString("status"),
                         resultSet.getString("priority"),
-                        resultSet.getDate("create_at").toLocalDate(),
+                        resultSet.getDate("create_date").toLocalDate(),
                         resultSet.getDate("due_date").toLocalDate(),
                         null,
                         null);
@@ -171,7 +171,6 @@ public class Tasks implements Initializable {
                                 TaskListData.remove(selectedTask);
                             }
                         });
-
                         HBox actionBox = new HBox(editIcon, deleteIcon);
                         actionBox.setStyle("-fx-alignment: center;");
                         HBox.setMargin(editIcon, new Insets(2, 3, 0, 2));
@@ -182,7 +181,6 @@ public class Tasks implements Initializable {
                     }
                 }
             };
-
             return cell;
         };
 
@@ -195,7 +193,7 @@ public class Tasks implements Initializable {
         try {
             int userId = UserSession.getInstance().getUserId();
             // Insert necessary data into trash table
-            String trashInsertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_at) " +
+            String trashInsertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_date) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement trashInsertStatement = connect.prepareStatement(trashInsertQuery);
             trashInsertStatement.setInt(1, userId);
@@ -207,7 +205,7 @@ public class Tasks implements Initializable {
             trashInsertStatement.setDate(7, java.sql.Date.valueOf(LocalDate.now()));
             trashInsertStatement.executeUpdate();
 
-            String tmpDeleteInsertQuery = "INSERT INTO tmpDelete (user_id, task_id, task, description, status, priority, create_at, due_date) " +
+            String tmpDeleteInsertQuery = "INSERT INTO tmpTrash (user_id, task_id, task, description, status, priority, create_date, due_date) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?,?)";
             PreparedStatement tmpDeleteInsertStatement = connect.prepareStatement(tmpDeleteInsertQuery);
             tmpDeleteInsertStatement.setInt(1, userId);
