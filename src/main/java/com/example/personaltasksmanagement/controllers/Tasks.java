@@ -164,10 +164,8 @@ public class Tasks implements Initializable {
 
                             Optional<ButtonType> result = alert.showAndWait();
                             if (result.isPresent() && result.get() == ButtonType.OK) {
-                                // Xóa task từ cơ sở dữ liệu
                                 deleteTask(selectedTask);
 
-                                // Cập nhật TableView
                                 TaskListData.remove(selectedTask);
                             }
                         });
@@ -192,7 +190,6 @@ public class Tasks implements Initializable {
     private void deleteTask(TaskData selectedTask) {
         try {
             int userId = UserSession.getInstance().getUserId();
-            // Insert necessary data into trash table
             String trashInsertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_date) " +
                     "VALUES (?, ?, ?, ?, ?, ?, ?)";
             PreparedStatement trashInsertStatement = connect.prepareStatement(trashInsertQuery);

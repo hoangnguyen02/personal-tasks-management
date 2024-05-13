@@ -1,0 +1,60 @@
+
+
+Version:	3.50
+CmdLine:	D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\phanmem.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Program Files\Java\jdk-17
+Check launcher:	C:\Program Files\Java\jdk-17\bin\javaw.exe (OK)
+Version string: 1.017.000_010 / 64-Bit (OK)
+Main class:	com.example.personaltasksmanagement.Main
+Info:		Classpath not defined.
+Launcher:	C:\Program Files\Java\jdk-17\bin\javaw.exe
+Launcher args:	 --module-path "C:\javafx-sdk-17.0.10" --add-modules javafx.controls,javafx.fxml  -classpath "D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\phanmem.exe" com.example.personaltasksmanagement.Main
+Args length:	227/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\phanmem.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Program Files\Java\jdk-17
+Check launcher:	C:\Program Files\Java\jdk-17\bin\javaw.exe (OK)
+Version string: 1.017.000_010 / 64-Bit (OK)
+Main class:	com.example.personaltasksmanagement.Main
+Info:		Classpath not defined.
+Launcher:	C:\Program Files\Java\jdk-17\bin\javaw.exe
+Launcher args:	 --module-path "C:\javafx-sdk-17.0.10" --add-modules javafx.controls,javafx.fxml  -classpath "D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\phanmem.exe" com.example.personaltasksmanagement.Main
+Args length:	227/32768 chars
+Exit code:	0
+
+
+Version:	3.50
+CmdLine:	D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\phanmem.exe --l4j-debug
+JNI:		No
+WOW64:		Yes
+Working dir:	D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\.
+Requires JDK:	No
+Requires 64-Bit: No
+Java min ver:	
+Java max ver:	
+JRE paths:	C:\Program Files\Java\jdk-17
+Check launcher:	C:\Program Files\Java\jdk-17\bin\javaw.exe (OK)
+Version string: 1.017.000_010 / 64-Bit (OK)
+Main class:	com.example.personaltasksmanagement.Main
+Info:		Classpath not defined.
+Launcher:	C:\Program Files\Java\jdk-17\bin\javaw.exe
+Launcher args:	 --module-path "C:\javafx-sdk-17.0.10" --add-modules javafx.controls,javafx.fxml  -classpath "D:\javafx\personal-tasks-management\out\artifacts\personal_tasks_management_jar\phanmem.exe" com.example.personaltasksmanagement.Main
+Args length:	227/32768 chars
+Exit code:	0

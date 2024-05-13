@@ -2,16 +2,17 @@
 
 <?import java.lang.String?>
 <?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
-
+<?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="652.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.AdminUser">
    <children>
-      <AnchorPane layoutX="19.0" layoutY="25.0" prefHeight="602.0" prefWidth="966.0" stylesheets="@../style/dashboard-form.css">
+      <AnchorPane layoutX="19.0" layoutY="25.0" prefHeight="602.0" prefWidth="966.0" stylesheets="@../style/admin.css">
          <styleClass>
             <String fx:value="shadow" />
             <String fx:value="radius" />
@@ -25,34 +26,38 @@
                   <String fx:value="white-bg" />
                </styleClass>
                <children>
-                  <Label layoutX="113.0" layoutY="23.0" text="Add Users" />
-                  <Label layoutX="25.0" layoutY="95.0" text="Full Name:" />
-                  <Label layoutX="25.0" layoutY="159.0" text="Email:" />
-                  <Label layoutX="25.0" layoutY="221.0" text="Username:" />
-                  <Label layoutX="27.0" layoutY="287.0" text="Password:" />
-                  <Button layoutX="53.0" layoutY="398.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="72.0" text="Submit" />
-                  <Button layoutX="167.0" layoutY="398.0" mnemonicParsing="false" prefHeight="36.0" prefWidth="72.0" text="Delete" />
-                  <TextField layoutX="104.0" layoutY="91.0" />
-                  <TextField layoutX="103.0" layoutY="155.0" />
-                  <TextField layoutX="103.0" layoutY="217.0" />
-                  <TextField layoutX="103.0" layoutY="283.0" />
+                  <Label layoutX="113.0" layoutY="23.0" styleClass="shadow" stylesheets="@../style/dashboard-form.css" text="Add Users">
+                     <font>
+                        <Font name="System Bold Italic" size="14.0" />
+                     </font></Label>
+                  <Label layoutX="25.0" layoutY="95.0" styleClass="filter" stylesheets="@../style/dashboard-form.css" text="Full Name:" />
+                  <Label layoutX="25.0" layoutY="159.0" styleClass="filter" stylesheets="@../style/dashboard-form.css" text="Email:" />
+                  <Label layoutX="25.0" layoutY="221.0" styleClass="filter" text="Username:" />
+                  <Label layoutX="27.0" layoutY="287.0" styleClass="filter" stylesheets="@../style/dashboard-form.css" text="Password:" />
+                  <Button fx:id="submit_admin" layoutX="53.0" layoutY="437.0" mnemonicParsing="false" onAction="#submit_action" prefHeight="36.0" prefWidth="72.0" styleClass="bg-color-2" stylesheets="@../style/admin.css" text="Submit" textFill="WHITE" />
+                  <Button fx:id="delete_admin" layoutX="158.0" layoutY="437.0" mnemonicParsing="false" onAction="#delete_action" prefHeight="36.0" prefWidth="72.0" styleClass="bg-color-2" stylesheets="@../style/admin.css" text="Delete" textFill="WHITE" />
+                  <TextField fx:id="nameTextField" layoutX="104.0" layoutY="81.0" prefHeight="36.0" prefWidth="150.0" />
+                  <TextField fx:id="emailTextField" layoutX="103.0" layoutY="145.0" prefHeight="36.0" prefWidth="150.0" />
+                  <TextField fx:id="usernameTextField" layoutX="103.0" layoutY="207.0" prefHeight="36.0" prefWidth="150.0" />
+                  <TextField fx:id="passwordTextField" layoutX="103.0" layoutY="273.0" prefHeight="36.0" prefWidth="150.0" />
+                  <Label layoutX="28.0" layoutY="356.0" styleClass="filter" stylesheets="@../style/dashboard-form.css" text="Role:" />
+                  <ComboBox fx:id="roleComboBox" layoutX="104.0" layoutY="354.0" prefWidth="150.0" />
                </children>
             </AnchorPane>
-            <AnchorPane layoutX="359.0" layoutY="32.0" prefHeight="542.0" prefWidth="580.0" stylesheets="@../style/dashboard-form.css">
+            <AnchorPane layoutX="359.0" layoutY="32.0" prefHeight="542.0" prefWidth="580.0" stylesheets="@../style/admin.css">
                <styleClass>
                   <String fx:value="shadow" />
                   <String fx:value="radius" />
                   <String fx:value="white-bg" />
                </styleClass>
                <children>
-                  <TextField layoutX="14.0" layoutY="14.0" prefHeight="36.0" prefWidth="414.0" promptText="Search" />
-                  <TableView layoutX="14.0" layoutY="71.0" prefHeight="372.0" prefWidth="555.0">
+                  <TextField fx:id="searchField" layoutX="14.0" layoutY="14.0" onAction="#action_search" prefHeight="36.0" prefWidth="414.0" promptText="Search" />
+                  <TableView fx:id="table_admin" layoutX="14.0" layoutY="71.0" prefHeight="455.0" prefWidth="559.0" stylesheets="@../style/admin.css">
                     <columns>
-                      <TableColumn prefWidth="45.5999755859375" text="ID" />
-                      <TableColumn prefWidth="122.39999389648438" text="Full Name" />
-                        <TableColumn prefWidth="168.0" text="Email" />
-                        <TableColumn minWidth="6.4000244140625" prefWidth="93.5999755859375" text="Username" />
-                        <TableColumn prefWidth="128.0" text="Password" />
+                      <TableColumn fx:id="fullname_admin" prefWidth="144.00003051757812" text="Full Name" />
+                        <TableColumn fx:id="email_admin" prefWidth="184.0" text="Email" />
+                        <TableColumn fx:id="username_admin" minWidth="6.4000244140625" prefWidth="116.7999267578125" text="Username" />
+                        <TableColumn fx:id="password_admin" prefWidth="112.800048828125" text="Password" />
                     </columns>
                   </TableView>
                </children>

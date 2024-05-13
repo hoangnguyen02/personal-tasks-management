@@ -20,6 +20,7 @@ import java.net.URL;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.time.LocalDate;
 import java.util.Optional;
 import java.util.ResourceBundle;
@@ -85,7 +86,6 @@ public class Complete implements Initializable {
         completePriority.setCellValueFactory(new PropertyValueFactory<>("priority"));
         completedAt.setCellValueFactory(new PropertyValueFactory<>("complete"));
 
-        // Tạo ô chứa nút xoá và khôi phục
         Callback<TableColumn<TaskData, String>, TableCell<TaskData, String>> cellFactory = (TableColumn<TaskData, String> param) -> {
             final TableCell<TaskData, String> cell = new TableCell<TaskData, String>() {
                 @Override
@@ -119,6 +119,8 @@ public class Complete implements Initializable {
                                     int rowsDeleted = statement.executeUpdate();
 
                                     if (rowsDeleted > 0) {
+//                                        transferTasksToTrash(selectedTask);
+
                                         TaskListData.remove(selectedTask);
 
                                         Alert successAlert = new Alert(Alert.AlertType.INFORMATION);
@@ -145,7 +147,6 @@ public class Complete implements Initializable {
                                 }
                             }
                         });
-                        // Tạo HBox chứa các nút xoá và khôi phục
                         HBox actionBox = new HBox(deleteIcon);
                         actionBox.setStyle("-fx-alignment: center;");
                         HBox.setMargin(deleteIcon, new Insets(2, 3, 0, 2));
@@ -163,7 +164,33 @@ public class Complete implements Initializable {
         complete_table.setItems(TaskListData);
     }
 
-
+//    private void transferTasksToTrash(TaskData selectedTask) {
+//        try {
+//            int userId = UserSession.getInstance().getUserId();
+//            String trashInsertQuery = "INSERT INTO trash (user_id, task_id, task, description, status, priority, delete_date) " +
+//                    "VALUES (?, ?, ?, ?, ?, ?, ?)";
+//            PreparedStatement trashInsertStatement = connect.prepareStatement(trashInsertQuery);
+//            trashInsertStatement.setInt(1, userId);
+//            trashInsertStatement.setInt(2, selectedTask.getTask_id());
+//            trashInsertStatement.setString(3, selectedTask.getTask());
+//            trashInsertStatement.setString(4, selectedTask.getDescription());
+//            trashInsertStatement.setString(5, selectedTask.getStatus());
+//            trashInsertStatement.setString(6, selectedTask.getPriority());
+//            trashInsertStatement.setDate(7, java.sql.Date.valueOf(LocalDate.now()));
+//            trashInsertStatement.executeUpdate();
+//
+//
+//            String deleteQuery = "DELETE FROM complete WHERE task_id = ?";
+//            PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);
+//            deleteStatement.setInt(1, selectedTask.getTask_id());
+//            deleteStatement.executeUpdate();
+//
+//            CompleteShowData();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//
+//        }
+//    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){

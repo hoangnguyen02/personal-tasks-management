@@ -1,0 +1,61 @@
+.bg-color-2{
+    -fx-background-color: linear-gradient(to bottom right,  #4f4f4f, #306090);
+}
+.radius{
+    -fx-background-radius: 5px;
+}
+
+.shadow{
+    -fx-effect: dropshadow(three-pass-box, rgba(0,0,0,0.5), 5,0,0,0);
+}
+.white-bg{
+    -fx-background-color: #fff;
+}
+
+
+.table-view {
+     -fx-background-color: transparent;
+     -fx-padding: 0;
+     /*-fx-border-width: 2px;*/
+     -fx-border-color: linear-gradient(to bottom right, #4f4f4f, #306090);
+     -fx-border-radius: 8px;
+     -fx-border-width: 0;
+     -fx-border-style: none;
+     -fx-background-insets: 0;
+
+ }
+.table-view .table-column {
+    -fx-text-alignment: center;
+}
+.table-view .table-row-cell:selected {
+    -fx-background-color: gray;
+}
+.table-view .column-header-background {
+
+    -fx-background-color: linear-gradient(to bottom right, #4f4f4f, #306090);
+    -fx-background-radius: 8px 8px 0 0;
+    -fx-background-insets: 0;
+}
+
+.table-view .column-header, .filter {
+    -fx-background-color: transparent;
+    -fx-font-size: 14px;
+}
+.table-view .column-header .label{
+    -fx-font-family: "Arial";
+    -fx-text-fill: #fff;
+}
+.table-view .table-column {
+    -fx-alignment: CENTER;
+}
+
+.table-view .table-row-cell {
+    -fx-border-width: 0;
+    -fx-background-color: transparent;
+    -fx-cell-size: 50px;
+}
+.text-field{
+    -fx-background-color: transparent;
+    -fx-border-color: #4f4f4f;
+    -fx-border-width:  0px 0px 2px 0px;
+}

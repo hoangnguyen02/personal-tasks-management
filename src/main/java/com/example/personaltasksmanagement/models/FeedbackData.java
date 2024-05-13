@@ -1,16 +1,14 @@
 package com.example.personaltasksmanagement.models;
 
-
-
 public class FeedbackData {
     private String feedbackName;
     private String feedbackDetails;
-    private String senderName;
+    private int userID;
 
-    public FeedbackData(String feedbackName, String feedbackDetails, String senderName) {
+    public FeedbackData(int userID,  String feedbackDetails,  String feedbackName) {
         this.feedbackName = feedbackName;
         this.feedbackDetails = feedbackDetails;
-        this.senderName = senderName;
+        this.userID = userID;
     }
 
     public String getFeedbackName() {
@@ -29,11 +27,21 @@ public class FeedbackData {
         this.feedbackDetails = feedbackDetails;
     }
 
-    public String getSenderName() {
-        return senderName;
+
+    public int getUserID() {
+        return userID;
     }
 
-    public void setSenderName(String senderName) {
-        this.senderName = senderName;
+    public void setUserID(int userID) {
+        this.userID = userID;
+    }
+
+    @Override
+    public String toString() {
+        return "FeedbackData{" +
+                "feedbackName='" + feedbackName + '\'' +
+                ", feedbackDetails='" + feedbackDetails + '\'' +
+                ", userID=" + userID +
+                '}';
     }
 }

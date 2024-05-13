@@ -20,6 +20,14 @@ import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.Region;
 import javafx.stage.Stage;
+import org.kohsuke.github.GitHub;
+import org.kohsuke.github.GitHubBuilder;
+import javafx.scene.web.WebEngine;
+import javafx.scene.web.WebView;
+
+
+import javafx.stage.Stage;
+import javafx.scene.Scene;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -91,6 +99,10 @@ public class Controller implements Initializable {
     public void loginGoogle() {
 
     }
+    public void github_action() throws IOException {
+
+    }
+
 
     public void registerAccount(){
         if (fullnameRegister.getText().isEmpty()
@@ -133,7 +145,7 @@ public class Controller implements Initializable {
                     alert.showAndWait();
                 }
                 else {
-                    String hashedPassword = hashPassword(passwordRegister.getText());
+                    String hashedPassword = passwordRegister.getText();
                     String insertData = "INSERT INTO users (full_name, email, username, password, date) VALUES(?,?,?,?,?)";
 
                     Date date = new Date();
@@ -205,31 +217,26 @@ public class Controller implements Initializable {
             Connection connect = DBConnection.connectionDB();
 
             try {
-                // Kiểm tra trong bảng admins trước
                 String adminSql = "SELECT * FROM admin WHERE username = ? AND password = ?";
                 PreparedStatement adminStatement = connect.prepareStatement(adminSql);
                 adminStatement.setString(1, loginUsername.getText());
                 adminStatement.setString(2, loginPassword.getText());
-
                 ResultSet adminResultSet = adminStatement.executeQuery();
 
                 if (adminResultSet.next()) {
-                    // Nếu là quản trị viên, chuyển đến giao diện quản lý
                     FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/admin-view.fxml"));
                     Parent root = loader.load();
                     Stage stage = (Stage) buttonLogin.getScene().getWindow();
                     stage.setScene(new Scene(root, Region.USE_COMPUTED_SIZE, Region.USE_COMPUTED_SIZE));
                 } else {
-                    // Nếu không phải quản trị viên, kiểm tra trong bảng users
                     String userSql = "SELECT * FROM users WHERE username = ? AND password = ?";
                     PreparedStatement userStatement = connect.prepareStatement(userSql);
                     userStatement.setString(1, loginUsername.getText());
-                    userStatement.setString(2, hashPassword(loginPassword.getText()));
+                    userStatement.setString(2, loginPassword.getText());
 
                     ResultSet userResultSet = userStatement.executeQuery();
 
                     if (userResultSet.next()) {
-                        // Nếu là người dùng thông thường, chuyển đến giao diện người dùng
                         int userId = userResultSet.getInt("user_id");
                         UserSession.getInstance().setUserId(userId);
 
@@ -254,6 +261,11 @@ public class Controller implements Initializable {
 
 
     public void initialize(URL url, ResourceBundle resourceBundle){
+        try {
+            github_action();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
 
     }
     @FXML
@@ -267,21 +279,21 @@ public class Controller implements Initializable {
         register_form.setVisible(true);
     }
 
-    public String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : messageDigest) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
+//    public String hashPassword(String password) {
+//        try {
+//            MessageDigest md = MessageDigest.getInstance("MD5");
+//            byte[] messageDigest = md.digest(password.getBytes());
+//            StringBuilder hexString = new StringBuilder();
+//            for (byte b : messageDigest) {
+//                String hex = Integer.toHexString(0xff & b);
+//                if (hex.length() == 1) hexString.append('0');
+//                hexString.append(hex);
+//            }
+//            return hexString.toString();
+//        } catch (NoSuchAlgorithmException e) {
+//            throw new RuntimeException(e);
+//        }
+//    }
     public void forgetPassword(ActionEvent event) throws IOException {
         FXMLLoader loader = new FXMLLoader(Main.class.getResource("views/forget-view.fxml"));
         Parent root = loader.load();

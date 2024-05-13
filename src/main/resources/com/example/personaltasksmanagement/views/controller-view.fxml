@@ -52,7 +52,7 @@
                               <Hyperlink fx:id="forgetPasword" layoutX="332.0" layoutY="364.0" onAction="#forgetPassword" text="Forgot your password?" />
                               <Label layoutX="314.0" layoutY="542.0" text="Or you can continue with" />
                               <Button fx:id="loginGoogle" layoutX="119.0" layoutY="578.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="185.0" text="Continue With Google" textFill="WHITE" />
-                              <Button fx:id="loginGithub" layoutX="339.0" layoutY="578.0" mnemonicParsing="false" prefHeight="38.0" prefWidth="186.0" text="Continue With Github" textFill="WHITE" />
+                              <Button fx:id="loginGithub" layoutX="339.0" layoutY="578.0" mnemonicParsing="false" onAction="#github_action" prefHeight="38.0" prefWidth="186.0" text="Continue With Github" textFill="WHITE" />
                               <FontAwesomeIconView fill="WHITE" glyphName="GOOGLE" layoutX="128.0" layoutY="605.0" size="20" />
                               <FontAwesomeIconView fill="WHITE" glyphName="GITHUB" layoutX="349.0" layoutY="605.0" size="20" />
                               <Hyperlink fx:id="login_registerHere" layoutX="226.0" layoutY="539.0" onAction="#switchToRegister" text="Register here" />
@@ -74,13 +74,17 @@
                      <children>
                         <AnchorPane prefHeight="657.0" prefWidth="318.0">
                            <children>
-                              <Label layoutX="83.0" layoutY="236.0" text="Wellcome to Todo App" />
-                              <Label layoutX="48.0" layoutY="279.0" text="Create an account to save all schedules" />
-                              <Label layoutX="69.0" layoutY="336.0" text="and access them from anywhere." />
                               <ImageView fitHeight="154.0" fitWidth="174.0" layoutX="69.0" layoutY="52.0" pickOnBounds="true" preserveRatio="true">
                                  <image>
                                     <Image url="@../image/logo.png" />
                                  </image></ImageView>
+                              <Label layoutX="58.0" layoutY="241.0" text="Wellcome to Todo App">
+                                 <font>
+                                    <Font name="System Bold" size="18.0" />
+                                 </font>
+                              </Label>
+                              <Label layoutX="52.0" layoutY="295.0" text="Create an account to save all schedules" />
+                              <Label layoutX="69.0" layoutY="313.0" text="and access them from anywhere." />
                            </children>
                         </AnchorPane>
                         <AnchorPane layoutX="318.0" prefHeight="658.0" prefWidth="630.0" style="-fx-background-color: #e6e8e7;" stylesheets="@../style/style.css">

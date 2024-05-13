@@ -10,6 +10,8 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.Node;
 import javafx.scene.control.*;
+import javafx.scene.paint.Color;
+import javafx.util.Callback;
 
 import java.net.URL;
 import java.sql.Connection;
@@ -110,6 +112,9 @@ public class AddNewTask implements Initializable {
            e.printStackTrace();
        }
     }
+    public void cancel_action(ActionEvent event){
+        ((Node) event.getSource()).getScene().getWindow().hide();
+    }
 
     private void updateTask() {
         try {
@@ -155,45 +160,45 @@ public class AddNewTask implements Initializable {
         }
     }
 
-    private ObservableList<String> getStatusName() {
-        ObservableList<String> statusName = FXCollections.observableArrayList();
-
-        String selectStatusName = "SELECT status_name FROM status";
-        Connection connect = DBConnection.connectionDB();
-
-        try {
-            PreparedStatement preparedStatement = connect.prepareStatement(selectStatusName);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()){
-                statusName.add(resultSet.getString("status_name"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return statusName;
-    }
-
-    private ObservableList<String> getPriorityName() {
-        ObservableList<String> priorityName = FXCollections.observableArrayList();
-
-        String selectPriorityName = "SELECT priority_name FROM priority";
-        Connection connect = DBConnection.connectionDB();
-
-        try {
-            PreparedStatement preparedStatement = connect.prepareStatement(selectPriorityName);
-            ResultSet resultSet = preparedStatement.executeQuery();
-
-            while (resultSet.next()){
-                priorityName.add(resultSet.getString("priority_name"));
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        return priorityName;
-    }
+//    private ObservableList<String> getStatusName() {
+//        ObservableList<String> statusName = FXCollections.observableArrayList();
+//
+//        String selectStatusName = "SELECT status_name FROM status";
+//        Connection connect = DBConnection.connectionDB();
+//
+//        try {
+//            PreparedStatement preparedStatement = connect.prepareStatement(selectStatusName);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            while (resultSet.next()){
+//                statusName.add(resultSet.getString("status_name"));
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return statusName;
+//    }
+//
+//    private ObservableList<String> getPriorityName() {
+//        ObservableList<String> priorityName = FXCollections.observableArrayList();
+//
+//        String selectPriorityName = "SELECT priority_name FROM priority";
+//        Connection connect = DBConnection.connectionDB();
+//
+//        try {
+//            PreparedStatement preparedStatement = connect.prepareStatement(selectPriorityName);
+//            ResultSet resultSet = preparedStatement.executeQuery();
+//
+//            while (resultSet.next()){
+//                priorityName.add(resultSet.getString("priority_name"));
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//
+//        return priorityName;
+//    }
     public void setTaskData(TaskData taskData) {
         this.taskData = taskData;
         if (taskData != null) {
@@ -210,9 +215,11 @@ public class AddNewTask implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
-        statusComboBox.setItems(getStatusName());
-        priorityComboBox.setItems(getPriorityName());
+        ObservableList<String> statusNames = FXCollections.observableArrayList("Not Started", "In Progress", "Complete!");
+        ObservableList<String> priorityNames = FXCollections.observableArrayList("High", "Medium", "Low");
 
+        statusComboBox.setItems(statusNames);
+        priorityComboBox.setItems(priorityNames);
     }
 
     private void showAlert(Alert.AlertType alertType, String title, String message) {

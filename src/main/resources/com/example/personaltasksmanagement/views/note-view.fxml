@@ -9,7 +9,6 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-
 <AnchorPane prefHeight="652.0" prefWidth="1005.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.personaltasksmanagement.controllers.Note">
    <styleClass>
       <String fx:value="white-bg" />
@@ -50,7 +49,10 @@
                         <Font name="System Bold Italic" size="14.0" />
                      </font>
                   </Label>
-                  <TextArea fx:id="AreaContent" layoutX="27.0" layoutY="54.0" prefHeight="414.0" prefWidth="646.0" styleClass="shadow" stylesheets="@../style/dashboard-form.css" />
+                  <TextArea fx:id="AreaContent" layoutX="27.0" layoutY="54.0" prefHeight="414.0" prefWidth="646.0" styleClass="shadow" stylesheets="@../style/dashboard-form.css">
+                     <font>
+                        <Font size="18.0" />
+                     </font></TextArea>
                   <Button fx:id="saveButton" layoutX="421.0" layoutY="479.0" mnemonicParsing="false" onAction="#save_action" prefHeight="34.0" prefWidth="58.0" styleClass="bg-color-1" stylesheets="@../style/dashboard-form.css" text="Save" textFill="WHITE" />
                   <Button fx:id="clearButton" layoutX="528.0" layoutY="479.0" mnemonicParsing="false" onAction="#clear_action" prefHeight="34.0" prefWidth="58.0" styleClass="bg-color-1" stylesheets="@../style/dashboard-form.css" text="Clear" textFill="WHITE" />
                   <Button fx:id="deleteButton" layoutX="614.0" layoutY="479.0" mnemonicParsing="false" onAction="#delete_action" prefHeight="34.0" prefWidth="58.0" styleClass="bg-color-1" text="Delete" textFill="WHITE" />

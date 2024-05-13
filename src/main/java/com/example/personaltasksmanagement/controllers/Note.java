@@ -146,35 +146,33 @@ public class Note implements Initializable {
                 });
 
                 textField.setOnAction(event -> {
-                    // Khi người dùng kết thúc chỉnh sửa trong TextField
                     NoteData item = getItem();
                     if (item != null) {
-                        item.setTitle(textField.getText()); // Cập nhật tiêu đề của mục với giá trị mới từ TextField
-                        commitEdit(item); // Cập nhật mục trong ListView
-                        textField.setEditable(false); // Ngăn chặn việc chỉnh sửa tiếp theo
+                        item.setTitle(textField.getText());
+                        commitEdit(item);
+                        textField.setEditable(false);
                     }
                 });
 
                 textField.focusedProperty().addListener((observable, oldValue, newValue) -> {
-                    // Khi TextField không còn được focus nữa
                     if (!newValue) {
                         NoteData item = getItem();
                         if (item != null) {
-                            item.setTitle(textField.getText()); // Cập nhật tiêu đề của mục với giá trị mới từ TextField
-                            commitEdit(item); // Cập nhật mục trong ListView
-                            textField.setEditable(false); // Ngăn chặn việc chỉnh sửa tiếp theo
+                            item.setTitle(textField.getText());
+                            commitEdit(item);
+                            textField.setEditable(false);
                         }
                     }
                 });
 
                 textField.setStyle(
                         "-fx-cursor: hand;"
-                                + "-fx-font-size: 14px;" // Thay đổi kích thước font chữ
-                                + "-fx-text-fill: #000000;" // Màu chữ
-                                + "-fx-background-color: transparent;" // Màu nền trong suốt
-                                + "-fx-border-color: transparent;" // Màu viền trong suốt
-                                + "-fx-max-width: 120px;" // Đặt kích thước maxWidth
-                                + "-fx-max-height: 50px;" // Đặt kích thước maxHeight
+                                + "-fx-font-size: 14px;"
+                                + "-fx-text-fill: #000000;"
+                                + "-fx-background-color: transparent;"
+                                + "-fx-border-color: transparent;"
+                                + "-fx-max-width: 120px;"
+                                + "-fx-max-height: 50px;"
                 );
             }
 

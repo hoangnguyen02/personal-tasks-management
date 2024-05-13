@@ -18,9 +18,7 @@ import javafx.scene.layout.AnchorPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.security.MessageDigest;
@@ -113,30 +111,34 @@ public class Setting implements Initializable {
         File file = open.showOpenDialog(importAvatar.getScene().getWindow());
 
         if (file != null) {
-            String relativePath = file.toURI().toString();
-            UserSession.getInstance().setAvatarPath(relativePath);
+            try {
+                FileInputStream inputStream = new FileInputStream(file);
+                byte[] imageData = inputStream.readAllBytes();
 
-            try (Connection connection = DriverManager.getConnection(DBConfig.JDBC_URL, DBConfig.JDBC_USER, DBConfig.JDBC_PASSWORD);
-                 PreparedStatement statement = connection.prepareStatement("UPDATE users SET avatar_path = ? WHERE user_id = ?")) {
+                try (Connection connection = DriverManager.getConnection(DBConfig.JDBC_URL, DBConfig.JDBC_USER, DBConfig.JDBC_PASSWORD);
+                     PreparedStatement statement = connection.prepareStatement("UPDATE users SET avatar_data = ? WHERE user_id = ?")) {
 
-                statement.setString(1, relativePath);
-                statement.setInt(2, UserSession.getInstance().getUserId());
-                int rowsAffected = statement.executeUpdate();
+                    statement.setBytes(1, imageData);
+                    statement.setInt(2, UserSession.getInstance().getUserId());
+                    int rowsAffected = statement.executeUpdate();
 
-                if (rowsAffected > 0) {
-                    showAlert(Alert.AlertType.INFORMATION, "Import Avatar", "Success", "Avatar updated successfully.");
-                    UserSession.getInstance().setAvatarPath(relativePath);
-                    loadUserData();
-                } else {
-
-                    showAlert(Alert.AlertType.ERROR, "Import Avatar", "Error", "Failed to update avatar.");
+                    if (rowsAffected > 0) {
+                        showAlert(Alert.AlertType.INFORMATION, "Import Avatar", "Success", "Avatar updated successfully.");
+                        loadUserData();
+                    } else {
+                        showAlert(Alert.AlertType.ERROR, "Import Avatar", "Error", "Failed to update avatar.");
+                    }
+                } catch (SQLException e) {
+                    e.printStackTrace();
+                    showAlert(Alert.AlertType.ERROR, "Import Avatar", "Error", "Database error occurred.");
                 }
-            } catch (SQLException e) {
+            } catch (IOException e) {
                 e.printStackTrace();
-                showAlert(Alert.AlertType.ERROR, "Import Avatar", "Error", "Database error occurred.");
+                showAlert(Alert.AlertType.ERROR, "Import Avatar", "Error", "Failed to read image file.");
             }
         }
     }
+
     private void loadUserData() {
         try {
             int userId = UserSession.getInstance().getUserId();
@@ -151,11 +153,14 @@ public class Setting implements Initializable {
                 nameLabel.setText(resultSet.getString("full_name"));
                 userNameLabel.setText(resultSet.getString("username"));
                 createdLabel.setText(resultSet.getDate("date").toString());
-                String avatarPath = resultSet.getString("avatar_path");
-                if (avatarPath != null && !avatarPath.isEmpty()) {
-                    Image image = new Image(avatarPath);
+
+                byte[] imageData = resultSet.getBytes("avatar_data");
+                if (imageData != null && imageData.length > 0) {
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
+                    Image image = new Image(inputStream);
                     user_imageView.setImage(image);
                 }
+
                 nameTextField.setText(resultSet.getString("full_name"));
                 userNameTextField.setText(resultSet.getString("username"));
                 mobilePhoneTextField.setText(resultSet.getString("mobile_phone"));
@@ -166,6 +171,7 @@ public class Setting implements Initializable {
             e.printStackTrace();
         }
     }
+
     public void submit_update() {
         try {
             String fullName = nameTextField.getText();
@@ -219,16 +225,14 @@ public class Setting implements Initializable {
                 if (resultSet.next()) {
                     String currentPassword = resultSet.getString("password");
 
-                    // Mã hóa mật khẩu cũ trước khi so sánh
-                    String hashedOldPassword = hashPassword(oldPassword);
+                    String OldPassword = oldPassword;
 
-                    if (!currentPassword.equals(hashedOldPassword)) {
+                    if (!currentPassword.equals(OldPassword)) {
                         showAlert(Alert.AlertType.ERROR, "Change Password", "Error", "Incorrect old password.");
                         return;
                     }
 
-                    // Mã hóa mật khẩu mới trước khi cập nhật
-                    String hashedNewPassword = hashPassword(newPassword);
+                    String hashedNewPassword = newPassword;
 
                     try (PreparedStatement updateStatement = connection.prepareStatement("UPDATE users SET password = ? WHERE user_id = ?")) {
                         updateStatement.setString(1, hashedNewPassword);
@@ -304,21 +308,6 @@ public class Setting implements Initializable {
         changePass_form.setVisible(false);
     }
 
-    public static String hashPassword(String password) {
-        try {
-            MessageDigest md = MessageDigest.getInstance("MD5");
-            byte[] messageDigest = md.digest(password.getBytes());
-            StringBuilder hexString = new StringBuilder();
-            for (byte b : messageDigest) {
-                String hex = Integer.toHexString(0xff & b);
-                if (hex.length() == 1) hexString.append('0');
-                hexString.append(hex);
-            }
-            return hexString.toString();
-        } catch (NoSuchAlgorithmException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
 
 

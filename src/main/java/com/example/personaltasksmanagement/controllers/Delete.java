@@ -128,6 +128,13 @@ public class Delete implements Initializable {
                             boolean success = recoverTask(selectedTask);
                             if (success) {
                                 taskListData.remove(selectedTask);
+                               try {
+                                   String deleteQuery = "DELETE FROM trash WHERE task_id=?";
+                                   PreparedStatement statement = connect.prepareStatement(deleteQuery);
+                                   statement.setInt(1, selectedTask.getTask_id());
+                               }catch (SQLException e){
+                                   e.printStackTrace();
+                               }
                             }
                         }
                     });
@@ -157,6 +164,8 @@ public class Delete implements Initializable {
                 showAlert(Alert.AlertType.WARNING, "Warning", "Task not found or already deleted");
                 return false;
             }
+
+
         } catch (SQLException e) {
             e.printStackTrace();
             showAlert(Alert.AlertType.ERROR, "Error", "Failed to delete task");
@@ -193,7 +202,7 @@ public class Delete implements Initializable {
                 insertStatement.setDate(7, Date.valueOf(dueDate));
                 insertStatement.executeUpdate();
 
-                String deleteQuery = "DELETE FROM tmpDelete WHERE task_id=?";
+                String deleteQuery = "DELETE FROM tmpTrash WHERE task_id=?";
                 PreparedStatement deleteStatement = connect.prepareStatement(deleteQuery);
                 deleteStatement.setInt(1, selectedTask.getTask_id());
                 deleteStatement.executeUpdate();

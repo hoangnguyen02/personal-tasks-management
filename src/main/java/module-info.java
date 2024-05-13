@@ -1,3 +1,4 @@
+
 module com.example.personaltasksmanagement {
     requires javafx.controls;
     requires javafx.fxml;
@@ -13,6 +14,8 @@ module com.example.personaltasksmanagement {
     requires spring.beans;
     requires spring.context;
     requires spring.web;
+    requires org.kohsuke.github.api;
+    requires javafx.web;
 
 
     opens com.example.personaltasksmanagement to javafx.fxml;

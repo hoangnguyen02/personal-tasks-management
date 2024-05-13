@@ -17,6 +17,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.StackPane;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
@@ -29,6 +30,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+
 
 public class Dashboard implements Initializable {
     @FXML
@@ -81,8 +83,44 @@ public class Dashboard implements Initializable {
     @FXML
     private TextField title_note;
 
+    @FXML
+    private ImageView img_avatar;
+
+
+
 
     Connection connect = DBConnection.connectionDB();
+
+
+
+    public void set_image(){
+        try {
+            int userId = UserSession.getInstance().getUserId();
+            String selectQuery = "SELECT avatar_data FROM users WHERE user_id = ?";
+
+            Connection connect = DBConnection.connectionDB();
+            PreparedStatement preparedStatement = connect.prepareStatement(selectQuery);
+            preparedStatement.setInt(1, userId);
+
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                // Đọc dữ liệu nhị phân của hình ảnh từ cơ sở dữ liệu
+                byte[] imageData = resultSet.getBytes("avatar_data");
+                if (imageData != null && imageData.length > 0) {
+                    ByteArrayInputStream inputStream = new ByteArrayInputStream(imageData);
+                    Image image = new Image(inputStream);
+                    img_avatar.setImage(image);
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+
+
+
     private void countCompleteTasks() {
         int userId = UserSession.getInstance().getUserId();
         try {
@@ -227,10 +265,10 @@ public class Dashboard implements Initializable {
                 labelName.setText(resultSet.getString("full_name"));
                 lableUsername.setText(resultSet.getString("username"));
                 labelEmail.setText(resultSet.getString("email"));
-
-                labelName.setText(resultSet.getString("full_name"));
-                lableUsername.setText(resultSet.getString("username"));
-                labelEmail.setText(resultSet.getString("email"));
+//
+//                labelName.setText(resultSet.getString("full_name"));
+//                lableUsername.setText(resultSet.getString("username"));
+//                labelEmail.setText(resultSet.getString("email"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -352,6 +390,7 @@ public class Dashboard implements Initializable {
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle){
+        set_image();
         countCompleteTasks();
         countNotes();
         countTotalTasks();
